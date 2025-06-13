@@ -287,7 +287,7 @@ class ConsumptionComparison extends Generic {
                 bottom: 10,
             },
 
-            xAxis: { type: 'value', name: (this.state.units && this.state.units[1] ? this.state.units[1] : 'missing') },
+            xAxis: { type: 'value', name: (this.state.units && this.state.units[1] ? this.state.units[1] : 'kWh') },
             yAxis: { type: 'category', data: data.map(item => item.name) },
             series: [
                 {
