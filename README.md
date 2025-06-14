@@ -12,7 +12,6 @@ This widget set consists of the following widgets:
 
 - Energy consumption comparison
 ![Energy comparison](img/comparison.png)
- 
 ![Pie chart](img/pie.png)
 
 - Time selector for energy consumption
