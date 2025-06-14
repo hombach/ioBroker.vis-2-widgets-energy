@@ -68,14 +68,6 @@ class ConsumptionComparison extends Generic {
                             hidden: 'data.type !== "pie"',
                         },
                         {
-                            name: 'innerRadius',
-                            label: 'inner_radius',
-                            type: 'slider',
-                            min: 0,
-                            max: 80,
-                            hidden: 'data.type !== "pie"',
-                        },
-                        {
                             name: 'inner_oid',
                             label: 'inner_oid',
                             type: 'id',
