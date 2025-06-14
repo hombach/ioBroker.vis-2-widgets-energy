@@ -25,6 +25,11 @@ This widget set consists of the following widgets:
     ### **WORK IN PROGRESS**
 -->
 ## Changelog
+
+### **WORK IN PROGRESS**
+* (hombach) remove double inner radius config (#393)
+* (hombach) view unit of first value in bar (#243)
+
 ### 1.0.2 (2024-08-06)
 * (bluefox) updated packages
 
