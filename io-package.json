@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "vis-2-widgets-energy",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "news": {
+      "1.0.3": {
+        "en": "remove double inner radius config (#393)\nview unit of first value in bar (#243)",
+        "de": "doppel-innenradius config (#393) entfernen\nansichtseinheit des ersten wertes in bar (#243)",
+        "ru": "удалить конфигурацию с двойным внутренним радиусом (#393)\nединица первого значения в баре (#243)",
+        "pt": "remover a configuração de raio interno duplo (# 393)\nview unit of first value in bar (# 243)",
+        "nl": "dubbele binnenstraalconfiguratie verwijderen (#393)\nview unit of first value in bar (#243)",
+        "fr": "supprimer la configuration de double rayon intérieur (#393)\nvue unité de première valeur dans la barre (#243)",
+        "it": "rimuovere il doppio raggio interno config (#393)\nunità di visualizzazione del primo valore in barra (#243)",
+        "es": "quitar doble radio interior config (#393)\nunidad de vista de primer valor en la barra (#243)",
+        "pl": "usuń podwójny wewnętrzny konfig promienia (# 393)\njednostka widoku o pierwszej wartości w pasku (# 243)",
+        "uk": "видалити подвійний внутрішній радіус config (#393)\nблок першого значення в барі (#243)",
+        "zh-cn": "删除双侧内半径配置 (# 393)\n在栏中第一个值的视图单位 (# 243)"
+      },
       "1.0.2": {
         "en": "updated packages",
         "de": "aktualisierte pakete",
@@ -80,19 +93,6 @@
         "pl": "Wsparcie dla przeciwników konsumpcji",
         "uk": "Додано підтримку лічильників для споживання",
         "zh-cn": "增加消费反补贴"
-      },
-      "0.3.5": {
-        "en": "Corrected the default history",
-        "de": "Korrektur der Standardhistorie",
-        "ru": "Исправлена история по умолчанию",
-        "pt": "Corrigido o histórico padrão",
-        "nl": "Vertaling:",
-        "fr": "Correction de l'historique par défaut",
-        "it": "Corretto la cronologia di default",
-        "es": "Corregido la historia predeterminada",
-        "pl": "Poprawiona domyślna historia",
-        "uk": "Виправлено історію за замовчуванням",
-        "zh-cn": "纠正违约历史"
       }
     },
     "licenseInformation": {

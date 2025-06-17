@@ -25,9 +25,10 @@ This widget set consists of the following widgets:
 -->
 ## Changelog
 
-### **WORK IN PROGRESS**
+### 1.0.3 (2025-06-17)
 * (hombach) remove double inner radius config (#393)
 * (hombach) view unit of first value in bar (#243)
+* (hombach) fix eslint config
 
 ### 1.0.2 (2024-08-06)
 * (bluefox) updated packages
