@@ -41,7 +41,7 @@
     "check": "tsc --noEmit -p tsconfig.check.json",
     "prepublishOnly": "npm run build",
     "lint": "eslint src-widgets/src/*.jsx",
-    "build": "node tasks",
+    "build": "node tasks --javascript",
     "test": "mocha ./test/*.test.js",
     "release": "release-script",
     "release-patch": "release-script patch --yes",
