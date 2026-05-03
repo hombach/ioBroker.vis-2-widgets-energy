@@ -76,6 +76,8 @@ This widget set consists of the following widgets:
 ### 0.1.3 (2022-11-13)
 * (bluefox) Initial commit
 
+[Older changelogs can be found there](CHANGELOG_OLD.md)
+
 ## License
 The MIT License (MIT)
 
