@@ -25,6 +25,11 @@ This widget set consists of the following widgets:
     ### **WORK IN PROGRESS**
 -->
 ## Changelog
+### **WORK IN PROGRESS**
+* (hombach) Fixed copyright year (#461)
+* (hombach) Removed deprecated common.noConfig from io-package.json (#499)
+* (bluefox) Fixed build failure by removing deprecated node-sass dependency
+
 ### 1.0.2 (2024-08-06)
 * (bluefox) updated packages
 
@@ -79,7 +84,7 @@ This widget set consists of the following widgets:
 ## License
 The MIT License (MIT)
 
-Copyright (c) 2022-2025 bluefox <dogafox@gmail.com>
+Copyright (c) 2022-2026 bluefox <dogafox@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
