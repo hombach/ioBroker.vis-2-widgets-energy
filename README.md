@@ -28,7 +28,8 @@ This widget set consists of the following widgets:
 ### **WORK IN PROGRESS**
 * (hombach) Fixed copyright year (#461)
 * (hombach) Removed deprecated common.noConfig from io-package.json (#499)
-* (bluefox) Fixed build failure by removing deprecated node-sass dependency
+* (hombach) Fixed build failure by removing deprecated node-sass dependency
+* (hombach) testing for node.js 24 (#383)
 
 ### 1.0.2 (2024-08-06)
 * (bluefox) updated packages
