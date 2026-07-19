@@ -16,6 +16,14 @@ updates:
       timezone: Europe/Berlin
     open-pull-requests-limit: 20
     versioning-strategy: increase
+    # Delay non-security npm updates by 7 days to reduce supply chain risk (W8915)
+    cooldown:
+      default-days: 7
+    # Do not raise PRs for major @types/node bumps (must match the Node.js runtime) (W8917)
+    ignore:
+      - dependency-name: '@types/node'
+        update-types:
+          - 'version-update:semver-major'
 
   - package-ecosystem: npm
     directory: "/src-widgets"
@@ -25,3 +33,9 @@ updates:
       timezone: Europe/Berlin
     open-pull-requests-limit: 20
     versioning-strategy: increase
+    cooldown:
+      default-days: 7
+    ignore:
+      - dependency-name: '@types/node'
+        update-types:
+          - 'version-update:semver-major'

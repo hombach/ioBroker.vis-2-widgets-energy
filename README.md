@@ -32,6 +32,8 @@ This widget set consists of the following widgets:
 * (hombach) Fixed unit of the feed-back (return) value not following the power line unit in the distribution widget (#212)
 * (hombach) Fixed wrong/missing Sunday data in the consumption widget (week view now starts correctly on Monday) (#270, #290)
 * (hombach) The comparison widget x-axis now uses the configured/detected device unit instead of always showing "kWh" (#243)
+* (hombach) Addressed repository checker findings: dependabot cooldown + @types/node major-ignore, removed self-referencing licenseInformation link, ignore .commitinfo (#512)
+* (hombach) Added a check-and-lint job to the CI workflow (#512)
 * (hombach) Fixed copyright year (#461)
 * (hombach) Removed deprecated common.noConfig from io-package.json (#499)
 * (hombach) Fixed build failure by removing deprecated node-sass dependency

@@ -22,8 +22,36 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # Performs quick type-check and lint before running the expensive adapter tests
+  check-and-lint:
+    if: contains(github.event.head_commit.message, '[skip ci]') == false
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Use Node.js 24.x
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24.x
+
+      - name: Install Dependencies
+        run: npm i
+
+      - name: Install widget dependencies
+        run: npm i -f
+        working-directory: src-widgets
+
+      - name: Type check
+        run: npm run check
+
+      - name: Lint
+        run: npm run lint
+
   # Runs adapter tests on all supported node versions and OSes
   adapter-tests:
+    needs: [check-and-lint]
     if: contains(github.event.head_commit.message, '[skip ci]') == false
 
     runs-on: ubuntu-latest
