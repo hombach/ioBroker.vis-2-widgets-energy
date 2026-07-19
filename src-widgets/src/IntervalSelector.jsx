@@ -115,7 +115,6 @@ class IntervalSelector extends Generic {
         this.propertiesUpdate();
     }
 
-    // eslint-disable-next-line class-methods-use-this
     getWidgetInfo() {
         return IntervalSelector.getWidgetInfo();
     }

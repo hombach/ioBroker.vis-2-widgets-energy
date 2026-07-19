@@ -955,7 +955,6 @@ class Distribution extends Generic {
         return this.wrapContent(content, null, { textAlign: 'center' });
     }
 
-    // eslint-disable-next-line class-methods-use-this
     getWidgetInfo() {
         return Distribution.getWidgetInfo();
     }

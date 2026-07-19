@@ -431,7 +431,6 @@ class Consumption extends Generic {
         this.readCharts();
     }
 
-    // eslint-disable-next-line class-methods-use-this
     getWidgetInfo() {
         return Consumption.getWidgetInfo();
     }

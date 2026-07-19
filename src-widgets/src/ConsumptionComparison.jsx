@@ -230,7 +230,6 @@ class ConsumptionComparison extends Generic {
         this.propertiesUpdate();
     }
 
-    // eslint-disable-next-line class-methods-use-this
     getWidgetInfo() {
         return ConsumptionComparison.getWidgetInfo();
     }
