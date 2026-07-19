@@ -3,7 +3,7 @@ import moment from 'moment';
 
 import { Button, ButtonGroup, IconButton } from '@mui/material';
 import { NavigateBefore as NavigateBeforeIcon, NavigateNext as NavigateNextIcon } from '@mui/icons-material';
-import type { RxWidgetInfo, VisRxWidgetProps, VisRxWidgetState } from '@iobroker/types-vis-2';
+import type { RxWidgetInfo, VisRxWidgetState } from '@iobroker/types-vis-2';
 import Generic from './Generic';
 import { getFromToTime } from './Utils';
 

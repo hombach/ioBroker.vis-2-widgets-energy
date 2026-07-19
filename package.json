@@ -40,7 +40,7 @@
   "scripts": {
     "check": "cd src-widgets && tsc",
     "prepublishOnly": "npm run build",
-    "lint": "eslint src-widgets/src/*.jsx",
+    "lint": "eslint src-widgets/src",
     "build": "node tasks",
     "test": "mocha ./test/*.test.js",
     "release": "release-script",

@@ -1,11 +1,18 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import { Icon, Utils } from '@iobroker/adapter-react-v5';
+import type { RxWidgetInfo, VisRxWidgetProps, VisRxWidgetState } from '@iobroker/types-vis-2';
 
 import Generic from './Generic';
 
-const styles = {
+interface DistributionState extends VisRxWidgetState {
+    offset?: number;
+    objects?: Record<string, any>;
+    units?: Record<string, any>;
+    [key: string]: any;
+}
+
+const styles: Record<string, React.CSSProperties> = {
     cardContent: {
         flex: 1,
         display: 'flex',
@@ -24,24 +31,32 @@ const styles = {
     },
 };
 
-function polarToCartesian(centerX, centerY, radius, angleInDegrees) {
-    const returnValue = {};
+function polarToCartesian(
+    centerX: number,
+    centerY: number,
+    radius: number,
+    angleInDegrees: number,
+): { x: number; y: number } {
     const angleInRadians = (angleInDegrees * Math.PI) / 180.0;
-    returnValue.x = Math.round((centerX + radius * Math.cos(angleInRadians)) * 100) / 100;
-    returnValue.y = Math.round((centerY + radius * Math.sin(angleInRadians)) * 100) / 100;
-    return returnValue;
+    return {
+        x: Math.round((centerX + radius * Math.cos(angleInRadians)) * 100) / 100,
+        y: Math.round((centerY + radius * Math.sin(angleInRadians)) * 100) / 100,
+    };
 }
 
-class Distribution extends Generic {
-    constructor(props) {
+class Distribution extends Generic<Record<string, any>, DistributionState> {
+    private readonly refCardContent: React.RefObject<HTMLDivElement | null> = React.createRef();
+
+    private lastRxData?: string;
+
+    private offsetInterval?: ReturnType<typeof setInterval>;
+
+    constructor(props: VisRxWidgetProps) {
         super(props);
-        this.state.offset = 0;
-        this.state.objects = {};
-        this.state.units = {};
-        this.refCardContent = React.createRef();
+        this.state = { ...this.state, offset: 0, objects: {}, units: {} };
     }
 
-    static getWidgetInfo() {
+    static getWidgetInfo(): RxWidgetInfo {
         return {
             id: 'tplEnergy2Distribution',
             visSet: 'vis-2-widgets-energy',
@@ -191,7 +206,7 @@ class Distribution extends Generic {
                                 { value: 0.001, label: '0.001' },
                             ],
                             label: 'factor',
-                            default: 1,
+                            default: 1 as any,
                             tooltip: 'factor_tooltip',
                         },
                         {
@@ -318,7 +333,7 @@ class Distribution extends Generic {
                                 { value: 0.001, label: '0.001' },
                             ],
                             label: 'factor',
-                            default: 1,
+                            default: 1 as any,
                             tooltip: 'factor_tooltip',
                         },
                         {
@@ -445,7 +460,7 @@ class Distribution extends Generic {
                                 { value: 0.001, label: '0.001' },
                             ],
                             label: 'factor',
-                            default: 1,
+                            default: 1 as any,
                             tooltip: 'factor_tooltip',
                         },
                         {
@@ -491,9 +506,9 @@ class Distribution extends Generic {
             // read object itself
             const object = await this.props.context.socket.getObject(oid);
             if (!object) {
-                return { common: {} };
+                return { common: {} } as any;
             }
-            object.common = object.common || {};
+            object.common = object.common || ({} as any);
             if (!iconExists && !object.common.icon && (object.type === 'state' || object.type === 'channel')) {
                 const idArray = oid.split('.');
 
@@ -521,8 +536,8 @@ class Distribution extends Generic {
 
         this.lastRxData = actualRxData;
 
-        const objects = {};
-        const units = {};
+        const objects: Record<string, any> = {};
+        const units: Record<string, any> = {};
 
         // try to find icons for all OIDs
         for (let i = 1; i <= this.state.rxData.nodesCount; i++) {
@@ -672,7 +687,7 @@ class Distribution extends Generic {
         const valueAndUnit = this.getValue(this.state.rxData['powerLine-oid'], this.state.objects.powerLine);
 
         // add power line
-        let circles = [{
+        let circles: any[] = [{
             name: this.state.rxData.powerLineName,
             color: valueAndUnit.iValue < 0 ? (this.props.context.themeType === 'dark' ? '#43d243' : '#266e26') : this.state.rxData.powerLineColor,
             radius: (size * (this.state.rxData.powerLineCircleSize || defaultRadiusSize)) / 100,
@@ -739,7 +754,7 @@ class Distribution extends Generic {
         const halfSize = size / 2;
         let max = halfSize;
         let min = halfSize;
-        const allCoordinates = [];
+        const allCoordinates: any[] = [];
         if (!this.props.editMode) {
             circles = circles.filter(circle => !circle.hide);
         }
@@ -747,7 +762,7 @@ class Distribution extends Generic {
         for (let i = 0; i < circles.length; i++) {
             const angle = 180 + (i * 360) / circles.length;
             const _coordinates = polarToCartesian(0, 0, circles[i].distance + circles[i].radius + homeRadius, angle);
-            const position = {
+            const position: any = {
                 top:       halfSize + _coordinates.y - circles[i].radius,
                 left:      halfSize + _coordinates.x - circles[i].radius,
                 leftLabel: halfSize + _coordinates.x - circles[i].radius,
@@ -959,12 +974,5 @@ class Distribution extends Generic {
         return Distribution.getWidgetInfo();
     }
 }
-
-Distribution.propTypes = {
-    socket: PropTypes.object,
-    themeType: PropTypes.string,
-    style: PropTypes.object,
-    data: PropTypes.object,
-};
 
 export default Distribution;

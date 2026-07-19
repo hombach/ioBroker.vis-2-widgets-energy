@@ -4,7 +4,7 @@ import ReactEchartsCore from 'echarts-for-react';
 import moment from 'moment';
 
 import { I18n } from '@iobroker/adapter-react-v5';
-import type { RxRenderWidgetProps, RxWidgetInfo, VisRxWidgetState } from '@iobroker/types-vis-2';
+import type { RxWidgetInfo, VisRxWidgetState } from '@iobroker/types-vis-2';
 
 import Generic from './Generic';
 import { getFromToTime } from './Utils';

@@ -16,9 +16,9 @@ export default [
         },
     },
     {
-        // The widget sources are React JSX (not TypeScript). The @iobroker base
-        // config only targets .js/.ts/.tsx, so JSX files need their own block.
-        files: ['src-widgets/src/**/*.jsx'],
+        // React widget sources. Add the react plugin config and relax a set of
+        // rules that are too noisy for these (migrated) legacy sources.
+        files: ['src-widgets/src/**/*.{ts,tsx}'],
         ...react.configs.flat.recommended,
         plugins: {
             react,
@@ -41,11 +41,11 @@ export default [
             'react/prop-types': 'off',
             'react/no-unescaped-entities': 'off',
             'react/display-name': 'off',
-            // Prettier formatting is not enforced on the legacy JSX sources (CRLF
-            // line endings, hand-formatted). Lint focuses on code quality only.
+            // Prettier formatting is not enforced on these (CRLF line endings,
+            // hand-formatted). Lint focuses on code quality only.
             'prettier/prettier': 'off',
-            // Type-aware rules require real TypeScript types; the widget sources are
-            // plain JSX, so these produce only false positives here.
+            // The migration is intentionally non-strict (lots of `any`), so the
+            // type-aware "unsafe" rules would only produce noise for now.
             '@typescript-eslint/no-unsafe-member-access': 'off',
             '@typescript-eslint/no-unsafe-call': 'off',
             '@typescript-eslint/no-unsafe-argument': 'off',
@@ -53,11 +53,14 @@ export default [
             '@typescript-eslint/no-unsafe-assignment': 'off',
             '@typescript-eslint/no-floating-promises': 'off',
             '@typescript-eslint/no-misused-promises': 'off',
-            // In plain JavaScript the JSDoc type (e.g. `@returns {echarts.EChartsOption}`)
-            // is the actual type information used by editors, so allow types in JSDoc and
-            // don't force a prose description (unlike in TypeScript, where types are redundant).
+            // Legacy JSDoc comments still carry type annotations; don't fight them.
             'jsdoc/no-types': 'off',
             'jsdoc/require-returns-description': 'off',
+            // The migration is deliberately non-strict: allow `any` and don't
+            // require explicit return / boundary types yet (tighten incrementally).
+            '@typescript-eslint/no-explicit-any': 'off',
+            '@typescript-eslint/explicit-function-return-type': 'off',
+            '@typescript-eslint/explicit-module-boundary-types': 'off',
         },
     },
     {
