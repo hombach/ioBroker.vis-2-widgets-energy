@@ -27,6 +27,7 @@ This widget set consists of the following widgets:
 ## Changelog
 
 ### **WORK IN PROGRESS**
+* (hombach) Migrated the widget build from Create React App (react-scripts/craco) to Vite with module federation
 * (hombach) Fixed broken `check` and `lint` scripts (added tsconfig files, repaired ESLint flat config for JSX sources)
 * (hombach) Fixed duplicated "inner radius" field in the consumption comparison widget config (#393)
 * (hombach) Fixed unit of the feed-back (return) value not following the power line unit in the distribution widget (#212)
