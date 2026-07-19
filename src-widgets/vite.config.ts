@@ -1,0 +1,102 @@
+// @ts-expect-error no types
+import react from '@vitejs/plugin-react';
+import commonjs from 'vite-plugin-commonjs';
+import { federation } from '@module-federation/vite';
+import topLevelAwait from 'vite-plugin-top-level-await';
+
+const singleton = (
+    extra: Record<string, unknown> = {},
+): { singleton: true; requiredVersion: '*' } & Record<string, unknown> => ({
+    singleton: true,
+    requiredVersion: '*',
+    ...extra,
+});
+
+const sharedModules: Record<string, ReturnType<typeof singleton>> = {
+    react: singleton(),
+    'react-dom': singleton(),
+    'react-dom/client': singleton(),
+    '@mui/material': singleton(),
+    '@mui/icons-material': singleton(),
+    '@mui/system': singleton(),
+    'prop-types': singleton(),
+    '@iobroker/adapter-react-v5': singleton(),
+    '@iobroker/adapter-react-v5/i18n/de.json': singleton(),
+    '@iobroker/adapter-react-v5/i18n/en.json': singleton(),
+    '@iobroker/adapter-react-v5/i18n/es.json': singleton(),
+    '@iobroker/adapter-react-v5/i18n/ru.json': singleton(),
+    '@iobroker/adapter-react-v5/i18n/nl.json': singleton(),
+    '@iobroker/adapter-react-v5/i18n/it.json': singleton(),
+    '@iobroker/adapter-react-v5/i18n/pl.json': singleton(),
+    '@iobroker/adapter-react-v5/i18n/pt.json': singleton(),
+    '@iobroker/adapter-react-v5/i18n/fr.json': singleton(),
+    '@iobroker/adapter-react-v5/i18n/uk.json': singleton(),
+    '@iobroker/adapter-react-v5/i18n/zh-cn.json': singleton(),
+};
+
+const config = {
+    plugins: [
+        federation({
+            manifest: true,
+            name: 'vis2energyWidgets',
+            filename: 'customWidgets.js',
+            exposes: {
+                './Consumption': './src/Consumption',
+                './ConsumptionComparison': './src/ConsumptionComparison',
+                './Distribution': './src/Distribution',
+                './IntervalSelector': './src/IntervalSelector',
+                './translations': './src/translations',
+            },
+            remotes: {},
+            shared: sharedModules,
+            dts: false,
+        }),
+        topLevelAwait({
+            promiseExportName: '__tla',
+            promiseImportName: (i: number): string => `__tla_${i}`,
+        }),
+        react(),
+        commonjs(),
+    ],
+    server: {
+        port: 4173,
+        proxy: {
+            '/_socket': 'http://localhost:8082',
+            '/vis.0': 'http://localhost:8082',
+            '/adapter': 'http://localhost:8082',
+            '/habpanel': 'http://localhost:8082',
+            '/vis': 'http://localhost:8082',
+            '/widgets': 'http://localhost:8082/vis',
+            '/widgets.html': 'http://localhost:8082/vis',
+            '/web': 'http://localhost:8082',
+            '/state': 'http://localhost:8082',
+        },
+    },
+    base: './',
+    resolve: {
+        dedupe: [
+            'react',
+            'react-dom',
+            'prop-types',
+            '@mui/material',
+            '@mui/system',
+            '@mui/icons-material',
+            '@iobroker/adapter-react-v5',
+        ],
+    },
+    build: {
+        target: 'chrome81',
+        outDir: './build',
+        rollupOptions: {
+            onwarn(warning: { code: string }, warn: (warning: { code: string }) => void): void {
+                // Suppress "Module level directives cause errors when bundled" warnings
+                if (warning.code === 'MODULE_LEVEL_DIRECTIVE') {
+                    return;
+                }
+                warn(warning);
+            },
+        },
+    },
+};
+
+export default config;

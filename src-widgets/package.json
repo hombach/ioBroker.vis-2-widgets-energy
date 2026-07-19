@@ -3,50 +3,34 @@
     "private": true,
     "version": "1.0.2",
     "dependencies": {
-        "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
-        "@craco/craco": "^7.1.0",
         "@emotion/react": "^11.14.0",
         "@emotion/styled": "^11.14.1",
         "@iobroker/adapter-react-v5": "^8.3.1",
         "@iobroker/vis-2-widgets-react-dev": "^4.0.4",
         "@mui/icons-material": "^9.2.0",
         "@mui/material": "^9.2.0",
-        "caniuse-lite": "^1.0.30001806",
-        "craco-esbuild": "^0.6.1",
-        "craco-module-federation": "^1.1.0",
         "date-fns": "^4.4.0",
         "echarts": "^6.1.0",
         "echarts-for-react": "^3.0.6",
-        "eslint": "^10.7.0",
-        "eslint-plugin-import": "^2.32.0",
-        "eslint-plugin-jsx-a11y": "^6.10.2",
-        "eslint-plugin-react": "^7.37.5",
-        "eslint-config-react-app": "^7.0.1",
-        "eslint-plugin-react-hooks": "^7.1.1",
         "moment": "^2.30.1",
         "prop-types": "^15.8.1",
         "react": "^18.3.1",
-        "react-dom": "^18.3.1",
-        "react-scripts": "^5.0.1",
-        "sass": "^1.101.0"
+        "react-dom": "^18.3.1"
+    },
+    "devDependencies": {
+        "@module-federation/runtime": "^0.18.3",
+        "@module-federation/vite": "^1.7.2",
+        "@vitejs/plugin-react": "^5.0.4",
+        "rollup": "^4.43.0",
+        "sass": "^1.101.0",
+        "vite": "^7.1.12",
+        "vite-plugin-commonjs": "^0.10.4",
+        "vite-plugin-top-level-await": "^1.6.0"
     },
     "scripts": {
-        "start": "set PORT=4173 && craco start",
-        "old-start": "set PORT=4173 && react-scripts start",
-        "lint": "eslint --fix --ext .js,.jsx src",
-        "build": "craco build",
-        "test": "react-scripts test",
-        "eject": "react-scripts eject",
+        "start": "vite --port 4173",
+        "build": "vite build",
+        "preview": "vite preview",
         "i18n": "node node_modules/@iobroker/vis-2-widgets-react-dev/searchI18n vis_2_widgets_energy"
-    },
-    "eslintConfig": {
-        "extends": "react-app"
-    },
-    "homepage": ".",
-    "browserslist": [
-        ">0.2%",
-        "not dead",
-        "not ie <= 11",
-        "not op_mini all"
-    ]
+    }
 }
