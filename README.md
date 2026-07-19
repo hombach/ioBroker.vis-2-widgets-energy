@@ -36,6 +36,7 @@ This widget set consists of the following widgets:
 * (hombach) Added a check-and-lint job to the CI workflow (#512)
 * (hombach) Updated echarts to v6 (#6)
 * (hombach) Updated TypeScript dev dependency to v6 (v7 still blocked by typescript-eslint)
+* (hombach) Updated @iobroker/adapter-react-v5 to v8 and added the @emotion/react + @emotion/styled dependencies required by MUI (#17)
 * (hombach) Fixed copyright year (#461)
 * (hombach) Removed deprecated common.noConfig from io-package.json (#499)
 * (hombach) Fixed build failure by removing deprecated node-sass dependency
