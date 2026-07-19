@@ -27,6 +27,10 @@ This widget set consists of the following widgets:
 ## Changelog
 
 ### **WORK IN PROGRESS**
+* (hombach) Fixed broken `check` and `lint` scripts (added tsconfig files, repaired ESLint flat config for JSX sources)
+* (hombach) Fixed duplicated "inner radius" field in the consumption comparison widget config (#393)
+* (hombach) Fixed unit of the feed-back (return) value not following the power line unit in the distribution widget (#212)
+* (hombach) Fixed wrong/missing Sunday data in the consumption widget (week view now starts correctly on Monday) (#270, #290)
 * (hombach) Fixed copyright year (#461)
 * (hombach) Removed deprecated common.noConfig from io-package.json (#499)
 * (hombach) Fixed build failure by removing deprecated node-sass dependency

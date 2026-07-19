@@ -5,9 +5,13 @@ export function getFromToTime(timeStart, timeInterval) {
         from.setHours(0, 0, 0, 0);
         to.setHours(23, 59, 59, 999);
     } else if (timeInterval === 'week') {
-        from.setDate(from.getDate() - from.getDay() + 1);
+        // getDay() returns 0 for Sunday; treat it as 7 so the week always starts on
+        // Monday and the current Sunday stays inside its own week (#270, #290).
+        // Otherwise on Sundays the whole week window was shifted forward by 7 days.
+        const dayOfWeek = from.getDay() || 7;
+        from.setDate(from.getDate() - dayOfWeek + 1);
         from.setHours(0, 0, 0, 0);
-        to.setDate(to.getDate() - to.getDay() + 7);
+        to.setDate(to.getDate() - dayOfWeek + 7);
         to.setHours(23, 59, 59, 999);
     } else if (timeInterval === 'month') {
         from.setDate(1);

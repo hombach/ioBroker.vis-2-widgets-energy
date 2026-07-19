@@ -579,6 +579,9 @@ class Distribution extends Generic {
 
         units[this.state.rxData['home-oid']] = objects.home.common.unit;
         units[this.state.rxData['powerLine-oid']] = objects.powerLine.common.unit;
+        // the feed-back (return) value shares the power line's unit; register it so
+        // that a changed power line unit is also applied to the return value (#212)
+        units[this.state.rxData['powerLineReturn-oid']] = objects.powerLine.common.unit;
 
         if (JSON.stringify(objects) !== JSON.stringify(this.state.objects)) {
             this.setState({ objects, units });
