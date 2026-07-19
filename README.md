@@ -33,15 +33,13 @@ This widget set consists of the following widgets:
 * (hombach) testing for node.js 24 (#383)
 * (hombach) updated github actions
 * (hombach) updated dependencies
+* (hombach) fixed repo checker warnings
 
 ### 1.0.2 (2024-08-06)
 * (bluefox) updated packages
 
 ### 1.0.0 (2024-07-07)
 * (bluefox) Removed withStyles package
-
-### 0.3.12 (2024-06-09)
-* (bluefox) Allowed setting the title color
 
 ### 0.3.11 (2024-02-16)
 * (bluefox) show value with green color if we feed back into power line
