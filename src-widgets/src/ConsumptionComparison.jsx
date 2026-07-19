@@ -259,6 +259,10 @@ class ConsumptionComparison extends Generic {
 
         data.reverse();
 
+        // Use the first configured/detected device unit as the x-axis label instead
+        // of the hard-coded "kWh" (this.state.unit was never set) (#243)
+        const axisUnit = (this.state.units && this.state.units.find(u => u)) || null;
+
         return {
             tooltip: {
                 // formatter: '{b}: {c} kWh',
@@ -278,7 +282,7 @@ class ConsumptionComparison extends Generic {
                 right: 50,
                 bottom: 10,
             },
-            xAxis: { name: this.state.unit ? Generic.t(this.state.unit) : Generic.t('kwh') },
+            xAxis: { type: 'value', name: axisUnit ? Generic.t(axisUnit) : Generic.t('kwh') },
             yAxis: { type: 'category', data: data.map(item => item.name) },
             series: [
                 {
