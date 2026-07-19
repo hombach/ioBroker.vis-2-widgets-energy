@@ -1,11 +1,16 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { Box } from '@mui/material';
 
 import ReactEchartsCore from 'echarts-for-react';
+import type { RxWidgetInfo, VisRxWidgetState } from '@iobroker/types-vis-2';
 import Generic from './Generic';
 
-const styles = {
+interface ConsumptionComparisonState extends VisRxWidgetState {
+    units?: any[];
+    [key: string]: any;
+}
+
+const styles: Record<string, any> = {
     cardContent: {
         flex: 1,
         display: 'flex',
@@ -22,13 +27,10 @@ const styles = {
     },
 };
 
-class ConsumptionComparison extends Generic {
-    constructor(props) {
-        super(props);
-        this.refCardContent = React.createRef();
-    }
+class ConsumptionComparison extends Generic<Record<string, any>, ConsumptionComparisonState> {
+    private readonly refCardContent: React.RefObject<HTMLDivElement | null> = React.createRef();
 
-    static getWidgetInfo() {
+    static getWidgetInfo(): RxWidgetInfo {
         return {
             id: 'tplEnergy2ConsumptionComparison',
             visSet: 'vis-2-widgets-energy',
@@ -176,7 +178,7 @@ class ConsumptionComparison extends Generic {
                                 { value: 0.01, label: '0.01' },
                                 { value: 0.001, label: '0.001' },
                             ],
-                            default: 1,
+                            default: 1 as any,
                         },
                     ],
                 },
@@ -420,7 +422,7 @@ class ConsumptionComparison extends Generic {
         >
             {size && <ReactEchartsCore
                 option={option}
-                theme={this.props.themeType === 'dark' ? 'dark' : ''}
+                theme={(this.props as any).themeType === 'dark' ? 'dark' : ''}
                 className="vis-2-widgets-energy-chart"
                 opts={{ renderer: 'svg' }}
                 style={{ height: size }}
@@ -434,12 +436,5 @@ class ConsumptionComparison extends Generic {
         return this.wrapContent(content, null, { textAlign: 'center' });
     }
 }
-
-ConsumptionComparison.propTypes = {
-    socket: PropTypes.object,
-    themeType: PropTypes.string,
-    style: PropTypes.object,
-    data: PropTypes.object,
-};
 
 export default ConsumptionComparison;
