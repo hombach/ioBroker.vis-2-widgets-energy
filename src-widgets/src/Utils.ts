@@ -1,4 +1,9 @@
-export function getFromToTime(timeStart, timeInterval) {
+export interface FromToTime {
+    from: Date;
+    to: Date;
+}
+
+export function getFromToTime(timeStart: number | Date | null | undefined, timeInterval: string): FromToTime {
     const from = new Date(timeStart || Date.now());
     const to = new Date(timeStart || Date.now());
     if (timeInterval === 'day') {

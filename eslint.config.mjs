@@ -52,6 +52,7 @@ export default [
             '@typescript-eslint/no-unsafe-return': 'off',
             '@typescript-eslint/no-unsafe-assignment': 'off',
             '@typescript-eslint/no-floating-promises': 'off',
+            '@typescript-eslint/no-misused-promises': 'off',
             // In plain JavaScript the JSDoc type (e.g. `@returns {echarts.EChartsOption}`)
             // is the actual type information used by editors, so allow types in JSDoc and
             // don't force a prose description (unlike in TypeScript, where types are redundant).

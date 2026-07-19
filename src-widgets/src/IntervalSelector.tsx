@@ -1,13 +1,19 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import moment from 'moment';
 
 import { Button, ButtonGroup, IconButton } from '@mui/material';
 import { NavigateBefore as NavigateBeforeIcon, NavigateNext as NavigateNextIcon } from '@mui/icons-material';
+import type { RxWidgetInfo, VisRxWidgetProps, VisRxWidgetState } from '@iobroker/types-vis-2';
 import Generic from './Generic';
 import { getFromToTime } from './Utils';
 
-const styles = {
+type EventHandler = (event: string, value?: any) => void;
+
+interface IntervalSelectorState extends VisRxWidgetState {
+    object?: ioBroker.Object | null;
+}
+
+const styles: Record<string, React.CSSProperties> = {
     nowButton: {
         marginRight: 20,
     },
@@ -29,14 +35,16 @@ const styles = {
     },
 };
 
-class IntervalSelector extends Generic {
-    constructor(props) {
-        super(props);
-        this.refTimeSelector = React.createRef();
-        this.eventHandlers = [];
-    }
+class IntervalSelector extends Generic<Record<string, any>, IntervalSelectorState> {
+    private readonly refTimeSelector: React.RefObject<HTMLDivElement | null> = React.createRef();
 
-    static getWidgetInfo() {
+    private eventHandlers: EventHandler[] = [];
+
+    private timerInform?: ReturnType<typeof setTimeout>;
+
+    private lastEvent?: string;
+
+    static getWidgetInfo(): RxWidgetInfo {
         return {
             id: 'tplEnergy2IntervalSelector',
             visSet: 'vis-2-widgets-energy',
@@ -81,14 +89,15 @@ class IntervalSelector extends Generic {
             const obj = await this.props.context.socket.getObject(this.state.rxData.oid);
             this.setState({ object: obj });
         }
-        if (this.refTimeSelector.current && !this.refTimeSelector.current._addEventHandler) {
-            this.refTimeSelector.current._addEventHandler = cb => {
+        const el = this.refTimeSelector.current as any;
+        if (el && !el._addEventHandler) {
+            el._addEventHandler = (cb: EventHandler) => {
                 if (!this.eventHandlers.includes(cb)) {
                     this.eventHandlers.push(cb);
                     this.informSubscribers();
                 }
             };
-            this.refTimeSelector.current._removeEventHandler = cb => {
+            el._removeEventHandler = (cb: EventHandler) => {
                 const pos = this.eventHandlers.indexOf(cb);
                 if (pos !== -1) {
                     this.eventHandlers.splice(pos, 1);
@@ -104,9 +113,10 @@ class IntervalSelector extends Generic {
 
     componentWillUnmount() {
         this.eventHandlers.forEach(cb => cb('unmount'));
-        if (this.refTimeSelector.current) {
-            this.refTimeSelector.current._addEventHandler = null;
-            this.refTimeSelector.current._removeEventHandler = null;
+        const el = this.refTimeSelector.current as any;
+        if (el) {
+            el._addEventHandler = null;
+            el._removeEventHandler = null;
         }
         super.componentWillUnmount();
     }
@@ -140,7 +150,7 @@ class IntervalSelector extends Generic {
             this.props.context.timeInterval;
     }
 
-    informSubscribers(start, interval) {
+    informSubscribers(start?: any, interval?: any) {
         this.timerInform && clearTimeout(this.timerInform);
         this.timerInform = setTimeout(() => {
             const event = {
@@ -183,7 +193,7 @@ class IntervalSelector extends Generic {
     renderWidgetBody(props) {
         super.renderWidgetBody(props);
 
-        let periodName = '';
+        let periodName: React.ReactNode = '';
 
         const interval = getFromToTime(this.getTimeStart(), this.getTimeInterval());
 
@@ -285,12 +295,5 @@ class IntervalSelector extends Generic {
         return this.wrapContent(content, null, { textAlign: 'center', padding: 0, height: '100%' });
     }
 }
-
-IntervalSelector.propTypes = {
-    socket: PropTypes.object,
-    themeType: PropTypes.string,
-    style: PropTypes.object,
-    data: PropTypes.object,
-};
 
 export default IntervalSelector;

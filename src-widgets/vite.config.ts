@@ -1,6 +1,7 @@
 // @ts-expect-error no types
 import react from '@vitejs/plugin-react';
 import commonjs from 'vite-plugin-commonjs';
+import vitetsConfigPaths from 'vite-tsconfig-paths';
 import { federation } from '@module-federation/vite';
 import topLevelAwait from 'vite-plugin-top-level-await';
 
@@ -56,6 +57,7 @@ const config = {
             promiseImportName: (i: number): string => `__tla_${i}`,
         }),
         react(),
+        vitetsConfigPaths(),
         commonjs(),
     ],
     server: {
