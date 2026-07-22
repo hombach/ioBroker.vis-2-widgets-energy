@@ -33,7 +33,7 @@ let __tla = (async () => {
     },
     "./ConsumptionComparison": async () => {
       await a("./ConsumptionComparison"), await Promise.all([]);
-      const e = await s(() => r(() => import("./ConsumptionComparison-Dx3Hd2Y4.js"), [], import.meta.url)), t = e && e.__mf_remote_dependency_pending;
+      const e = await s(() => r(() => import("./ConsumptionComparison-XxwDxwzy.js"), [], import.meta.url)), t = e && e.__mf_remote_dependency_pending;
       t && typeof t.then == "function" && await t;
       const n = {};
       return Object.assign(n, e), Object.defineProperty(n, "__esModule", {

@@ -283,7 +283,7 @@ class ConsumptionComparison extends Generic<Record<string, any>, ConsumptionComp
                 right: 50,
                 bottom: 10,
             },
-            xAxis: { type: 'value', name: axisUnit ? Generic.t(axisUnit) : Generic.t('kwh') },
+            xAxis: { type: 'value', name: axisUnit ? axisUnit : Generic.t('kwh') },
             yAxis: { type: 'category', data: data.map(item => item.name) },
             series: [
                 {

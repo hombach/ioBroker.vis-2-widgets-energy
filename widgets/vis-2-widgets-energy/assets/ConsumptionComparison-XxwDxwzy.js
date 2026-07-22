@@ -49,7 +49,7 @@ class l extends o {
     }
     i.reverse();
     const s = this.state.units && this.state.units.find((a) => a) || null;
-    return { tooltip: { formatter: (a) => `${a.name}: ${a.data.value}${this.state.units && this.state.units[a.dataIndex + 1] ? ` ${this.state.units[a.dataIndex + 1]}` : ""}` }, title: { show: false }, legend: { show: false }, backgroundColor: "transparent", grid: { containLabel: true, left: 10, top: 5, right: 50, bottom: 10 }, xAxis: { type: "value", name: s ? o.t(s) : o.t("kwh") }, yAxis: { type: "category", data: i.map((a) => a.name) }, series: [{ type: "bar", data: i.map((a) => ({ value: a.value, itemStyle: { color: a.color } })) }] };
+    return { tooltip: { formatter: (a) => `${a.name}: ${a.data.value}${this.state.units && this.state.units[a.dataIndex + 1] ? ` ${this.state.units[a.dataIndex + 1]}` : ""}` }, title: { show: false }, legend: { show: false }, backgroundColor: "transparent", grid: { containLabel: true, left: 10, top: 5, right: 50, bottom: 10 }, xAxis: { type: "value", name: s || o.t("kwh") }, yAxis: { type: "category", data: i.map((a) => a.name) }, series: [{ type: "bar", data: i.map((a) => ({ value: a.value, itemStyle: { color: a.color } })) }] };
   }
   getPieOption() {
     const i = [];
