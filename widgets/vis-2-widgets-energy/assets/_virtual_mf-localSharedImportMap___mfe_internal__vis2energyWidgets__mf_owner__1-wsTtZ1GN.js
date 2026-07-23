@@ -30,7 +30,7 @@ let __tla = Promise.all([
     "@iobroker/adapter-react-v5/i18n/ru.json": async () => await a(() => import("./_virtual_mf___mfe_internal__vis2energyWidgets__mf_owner__1__prebuild___mf_0_iobroker_mf_1_adapter_mf_2_react_mf_2_v5_mf_1_i18n_mf_1_ru_mf_3_json__prebuild__-Bl5qeXoo.js"), [], import.meta.url),
     "@iobroker/adapter-react-v5/i18n/uk.json": async () => await a(() => import("./_virtual_mf___mfe_internal__vis2energyWidgets__mf_owner__1__prebuild___mf_0_iobroker_mf_1_adapter_mf_2_react_mf_2_v5_mf_1_i18n_mf_1_uk_mf_3_json__prebuild__-BDu5sg7h.js"), [], import.meta.url),
     "@iobroker/adapter-react-v5/i18n/zh-cn.json": async () => await a(() => import("./_virtual_mf___mfe_internal__vis2energyWidgets__mf_owner__1__prebuild___mf_0_iobroker_mf_1_adapter_mf_2_react_mf_2_v5_mf_1_i18n_mf_1_zh_mf_2_cn_mf_3_json__prebuild__-DUVS8FwS.js"), [], import.meta.url),
-    "@iobroker/adapter-react-v5": async () => await a(() => import("./_virtual_mf___mfe_internal__vis2energyWidgets__mf_owner__1__prebuild___mf_0_iobroker_mf_1_adapter_mf_2_react_mf_2_v5__prebuild__-DxCt-d4P.js"), [], import.meta.url)
+    "@iobroker/adapter-react-v5": async () => await a(() => import("./_virtual_mf___mfe_internal__vis2energyWidgets__mf_owner__1__prebuild___mf_0_iobroker_mf_1_adapter_mf_2_react_mf_2_v5__prebuild__-DA8qb4m4.js"), [], import.meta.url)
   };
   n = {
     react: {

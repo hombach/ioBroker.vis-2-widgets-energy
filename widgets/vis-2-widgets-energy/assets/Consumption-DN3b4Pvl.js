@@ -2,7 +2,7 @@ import { _ as u } from "./_virtual_mf___mfe_internal__vis2energyWidgets__mf_owne
 import { o as D } from "./_virtual_mf___mfe_internal__vis2energyWidgets__mf_owner__1__loadShare__react__loadShare__.js-C7HYJM3r.js";
 import { E as I } from "./index-BIwAPpOA.js";
 import { g as v, h } from "./Utils-CEFQvMQb.js";
-import { I as S } from "./_virtual_mf___mfe_internal__vis2energyWidgets__mf_owner__1__loadShare___mf_0_iobroker_mf_1_adapter_mf_2_react_mf_2_v5__loadShare__.js-D9hGLxGk.js";
+import { I as S } from "./_virtual_mf___mfe_internal__vis2energyWidgets__mf_owner__1__loadShare___mf_0_iobroker_mf_1_adapter_mf_2_react_mf_2_v5__loadShare__.js-BdPsfiJc.js";
 import { G as w } from "./Generic-BqkVmzeM.js";
 import "./_virtual_mf___mfe_internal__vis2energyWidgets__mf_owner__1__loadShare___mf_0_mui_mf_1_material__loadShare__.js-D3v0E93H.js";
 import "./_virtual_mf___mfe_internal__vis2energyWidgets__mf_owner__1__loadShare___mf_0_mui_mf_1_icons_mf_2_material__loadShare__.js-CyCVg1DT.js";

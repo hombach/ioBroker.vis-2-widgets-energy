@@ -62,7 +62,7 @@ let __tla = (async () => {
         await m2.__tla;
         return m2;
       }), [], import.meta.url)).init(), { usedShared: h } = await b(async () => {
-        const { usedShared: r } = await import("./_virtual_mf-localSharedImportMap___mfe_internal__vis2energyWidgets__mf_owner__1-B8XPk2nQ.js").then(async (m2) => {
+        const { usedShared: r } = await import("./_virtual_mf-localSharedImportMap___mfe_internal__vis2energyWidgets__mf_owner__1-wsTtZ1GN.js").then(async (m2) => {
           await m2.__tla;
           return m2;
         });

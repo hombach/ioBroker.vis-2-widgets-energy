@@ -122,7 +122,7 @@ let __tla = Promise.all([
     };
   };
   async function Xe() {
-    return H || (H = oe(() => ve(() => import("./assets/_virtual_mf-localSharedImportMap___mfe_internal__vis2energyWidgets__mf_owner__1-B8XPk2nQ.js").then(async (m) => {
+    return H || (H = oe(() => ve(() => import("./assets/_virtual_mf-localSharedImportMap___mfe_internal__vis2energyWidgets__mf_owner__1-wsTtZ1GN.js").then(async (m) => {
       await m.__tla;
       return m;
     }), [], import.meta.url)).catch((s) => {
@@ -130,7 +130,7 @@ let __tla = Promise.all([
     })), H;
   }
   async function Ye() {
-    return U || (U = oe(() => ve(() => import("./assets/virtualExposes-NffkXiRw.js").then(async (m) => {
+    return U || (U = oe(() => ve(() => import("./assets/virtualExposes-B7wUfbGX.js").then(async (m) => {
       await m.__tla;
       return m;
     }), [], import.meta.url)).then((s) => s.default ?? s).catch((s) => {

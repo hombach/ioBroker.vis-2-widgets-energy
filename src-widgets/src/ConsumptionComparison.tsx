@@ -207,11 +207,6 @@ class ConsumptionComparison extends Generic<Record<string, any>, ConsumptionComp
                 const object = _objects[this.state.rxData[`oid${i}`]];
                 if (object?.common?.unit) {
                     units[i] = object.common.unit;
-                    if (units[i] === 'kW') {
-                        units[i] = 'kWh';
-                    } else if (units[i] === 'W') {
-                        units[i] = 'Wh';
-                    }
                 }
             } else {
                 units[i] = this.state.rxData[`unit${i}`];
@@ -246,8 +241,6 @@ class ConsumptionComparison extends Generic<Record<string, any>, ConsumptionComp
             let value = this.state.values[`${this.state.rxData[`oid${i}`]}.val`] || 0;
             if (this.state.rxData[`factor${i}`] && this.state.rxData[`factor${i}`] !== 1) {
                 value *= this.state.rxData[`factor${i}`];
-            } else if (this.state.units && this.state.units[i] === 'Wh') {
-                value /= 1000;
             }
             value = Math.round(value * 100) / 100;
 
@@ -310,8 +303,6 @@ class ConsumptionComparison extends Generic<Record<string, any>, ConsumptionComp
             this.state.rxData[`factor${i}`] = parseFloat(this.state.rxData[`factor${i}`]) || 1;
             if (this.state.rxData[`factor${i}`] && this.state.rxData[`factor${i}`] !== 1) {
                 value *= this.state.rxData[`factor${i}`];
-            } else if (this.state.units && this.state.units[i] === 'Wh') {
-                value /= 1000;
             }
             value = Math.round(value * 100) / 100;
 
