@@ -110,5 +110,6 @@
   "difference": "Calcola la differenza",
   "difference_tooltip": "Verrà utilizzata la differenza tra due valori. Utile per i contatori.",
   "Value": "Valore",
-  "text_color": "Colore del testo"
+  "text_color": "Colore del testo",
+  "stacked": "Barre impilate"
 }

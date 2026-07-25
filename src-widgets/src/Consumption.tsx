@@ -57,6 +57,12 @@ class Consumption extends Generic<Record<string, any>, ConsumptionState> {
                         type: 'checkbox',
                     },
                     {
+                        name: 'stacked',
+                        label: 'stacked',
+                        type: 'checkbox',
+                        default: true,
+                    },
+                    {
                         name: 'widgetTitle',
                         label: 'name',
                         hidden: '!!data.noCard',
@@ -523,7 +529,7 @@ class Consumption extends Generic<Record<string, any>, ConsumptionState> {
                         color: item.color,
                     },
                     data: item.values?.map((dateValue: any) => dateValue.val * item.factor),
-                    stack: 'one',
+                    stack: this.state.rxData.stacked === false ? undefined : 'one',
                 }
             )),
         };

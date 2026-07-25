@@ -110,5 +110,6 @@
   "difference": "Oblicz różnicę",
   "difference_tooltip": "Zostanie użyta różnica między dwiema wartościami. Przydatne do liczników.",
   "Value": "Wartość",
-  "text_color": "Kolor tekstu"
+  "text_color": "Kolor tekstu",
+  "stacked": "Słupki skumulowane"
 }

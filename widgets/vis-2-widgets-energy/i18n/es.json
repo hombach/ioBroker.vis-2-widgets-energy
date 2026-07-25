@@ -110,5 +110,6 @@
   "difference": "Calcular diferencia",
   "difference_tooltip": "Se utilizará la diferencia entre dos valores. Útil para mostradores.",
   "Value": "Valor",
-  "text_color": "Color de texto"
+  "text_color": "Color de texto",
+  "stacked": "Barras apiladas"
 }

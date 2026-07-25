@@ -110,5 +110,6 @@
   "difference": "Differenz berechnen",
   "difference_tooltip": "Es wird die Differenz zwischen zwei Werten verwendet. Nützlich für Zähler.",
   "Value": "Wert",
-  "text_color": "Textfarbe"
+  "text_color": "Textfarbe",
+  "stacked": "Balken gestapelt"
 }

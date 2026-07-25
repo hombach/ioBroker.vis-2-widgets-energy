@@ -110,5 +110,6 @@
   "difference": "Bereken het verschil",
   "difference_tooltip": "Het verschil tussen twee waarden wordt gebruikt. Handig voor tellers.",
   "Value": "Waarde",
-  "text_color": "Tekst kleur"
+  "text_color": "Tekst kleur",
+  "stacked": "Gestapelde balken"
 }

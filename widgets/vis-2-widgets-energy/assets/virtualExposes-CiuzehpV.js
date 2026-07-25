@@ -23,7 +23,7 @@ let __tla = (async () => {
   f = {
     "./Consumption": async () => {
       await a("./Consumption"), await Promise.all([]);
-      const e = await s(() => r(() => import("./Consumption-C6Rz1Wi6.js"), [], import.meta.url)), t = e && e.__mf_remote_dependency_pending;
+      const e = await s(() => r(() => import("./Consumption-DpJRo23P.js"), [], import.meta.url)), t = e && e.__mf_remote_dependency_pending;
       t && typeof t.then == "function" && await t;
       const n = {};
       return Object.assign(n, e), Object.defineProperty(n, "__esModule", {
@@ -63,7 +63,7 @@ let __tla = (async () => {
     },
     "./translations": async () => {
       await a("./translations"), await Promise.all([]);
-      const e = await s(() => r(() => import("./translations-DzL1UiEE.js"), [], import.meta.url)), t = e && e.__mf_remote_dependency_pending;
+      const e = await s(() => r(() => import("./translations-DGa9g5JI.js"), [], import.meta.url)), t = e && e.__mf_remote_dependency_pending;
       t && typeof t.then == "function" && await t;
       const n = {};
       return Object.assign(n, e), Object.defineProperty(n, "__esModule", {

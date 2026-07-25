@@ -110,5 +110,6 @@
   "difference": "Calculate difference",
   "difference_tooltip": "The difference between two values will be used. Usefull for counters.",
   "Value": "Value",
-  "text_color": "Text color"
+  "text_color": "Text color",
+  "stacked": "Stacked bars"
 }
