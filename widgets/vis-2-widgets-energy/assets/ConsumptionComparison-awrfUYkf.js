@@ -1,7 +1,7 @@
 import { _ as r } from "./_virtual_mf___mfe_internal__vis2energyWidgets__mf_owner__1__loadShare__react_mf_1_jsx_mf_2_runtime__loadShare__.js-CFKObsBr.js";
 import { o as h } from "./_virtual_mf___mfe_internal__vis2energyWidgets__mf_owner__1__loadShare__react__loadShare__.js-C7HYJM3r.js";
-import { q as c } from "./_virtual_mf___mfe_internal__vis2energyWidgets__mf_owner__1__loadShare___mf_0_mui_mf_1_material__loadShare__.js-D3v0E93H.js";
-import { E as m } from "./index-BIwAPpOA.js";
+import { q as m } from "./_virtual_mf___mfe_internal__vis2energyWidgets__mf_owner__1__loadShare___mf_0_mui_mf_1_material__loadShare__.js-D3v0E93H.js";
+import { E as c } from "./index-BIwAPpOA.js";
 import { G as o } from "./Generic-BqkVmzeM.js";
 import "./__virtual_mf___mfe_internal__vis2energyWidgets__mf_owner__1__loadShare__react__loadShare__.js_commonjs-proxy-BuG6-OD8.js";
 import "./_virtual_mf___mfe_internal__vis2energyWidgets__mf_owner__1__loadShare__prop_mf_2_types__loadShare__.js-CJko9B86.js";
@@ -49,7 +49,7 @@ class l extends o {
     }
     a.reverse();
     const n = this.state.units && this.state.units.find((e) => e) || null;
-    return { tooltip: { formatter: (e) => `${e.name}: ${e.data.value}${this.state.units && this.state.units[e.dataIndex + 1] ? ` ${this.state.units[e.dataIndex + 1]}` : ""}` }, title: { show: false }, legend: { show: false }, backgroundColor: "transparent", animation: !this.state.rxData.noAnimation, animationDuration: parseInt(this.state.rxData.animationDuration, 10) || 1e3, grid: { containLabel: true, left: 10, top: 5, right: 50, bottom: 10 }, xAxis: { type: "value", name: n || o.t("kwh") }, yAxis: { type: "category", data: a.map((e) => e.name) }, series: [{ type: "bar", data: a.map((e) => ({ value: e.value, itemStyle: { color: e.color } })) }] };
+    return { tooltip: { formatter: (e) => `${e.name}: ${e.data.value}${this.state.units && this.state.units[e.dataIndex + 1] ? ` ${this.state.units[e.dataIndex + 1]}` : ""}` }, title: { show: false }, legend: { show: false }, backgroundColor: "transparent", animation: !this.state.rxData.noAnimation, animationDuration: parseInt(this.state.rxData.animationDuration, 10) || 1e3, animationDurationUpdate: parseInt(this.state.rxData.animationDuration, 10) || 1e3, grid: { containLabel: true, left: 10, top: 5, right: 50, bottom: 10 }, xAxis: { type: "value", name: n || o.t("kwh") }, yAxis: { type: "category", data: a.map((e) => e.name) }, series: [{ type: "bar", data: a.map((e) => ({ value: e.value, itemStyle: { color: e.color } })) }] };
   }
   getPieOption() {
     const a = [];
@@ -67,7 +67,7 @@ class l extends o {
     a.reverse();
     const i = { show: true, text: [n, e].filter((t) => t).join(`
 `), rich: { text: { fontSize: 10 }, value: { fontSize: 20 } }, left: "center", top: "center", textStyle: { color: this.props.context.themeType === "dark" ? "#c7c7c7" : "#3d3d3d" } };
-    return { tooltip: { trigger: "item", formatter: (t) => `${t.name}: ${t.data.value}${this.state.units && this.state.units[t.dataIndex + 1] ? ` ${this.state.units[t.dataIndex + 1]}` : ""}` }, title: i, backgroundColor: "transparent", animation: !this.state.rxData.noAnimation, animationDuration: parseInt(this.state.rxData.animationDuration, 10) || 1e3, grid: { left: 10, top: 0, right: 10, bottom: 0 }, xAxis: { show: false }, yAxis: { show: false }, legend: { show: this.state.rxData.legend, bottom: 0, left: "center", formatter: (t) => {
+    return { tooltip: { trigger: "item", formatter: (t) => `${t.name}: ${t.data.value}${this.state.units && this.state.units[t.dataIndex + 1] ? ` ${this.state.units[t.dataIndex + 1]}` : ""}` }, title: i, backgroundColor: "transparent", animation: !this.state.rxData.noAnimation, animationDuration: parseInt(this.state.rxData.animationDuration, 10) || 1e3, animationDurationUpdate: parseInt(this.state.rxData.animationDuration, 10) || 1e3, grid: { left: 10, top: 0, right: 10, bottom: 0 }, xAxis: { show: false }, yAxis: { show: false }, legend: { show: this.state.rxData.legend, bottom: 0, left: "center", formatter: (t) => {
       const s = a.findIndex((d) => d.name === t);
       return `${t}: ${a[s].value}${this.state.units && this.state.units[s + 1] ? ` ${this.state.units[s + 1]}` : ""}`;
     }, textStyle: { color: this.props.context.themeType === "dark" ? "#fff" : "#000" } }, series: [{ type: "pie", radius: [`${parseFloat(this.state.rxData.innerRadius) || 0}%`, this.state.rxData.legend ? `${100 - (this.state.rxData.legendHeight || 0)}%` : "100%"], data: a, percentPrecision: this.state.rxData.precision || 0, label: { show: !this.state.rxData.hideLabels, position: "inside", formatter: "{d}%" } }] };
@@ -76,7 +76,7 @@ class l extends o {
     super.renderWidgetBody(a);
     let n;
     this.refCardContent.current ? n = this.refCardContent.current.offsetHeight : setTimeout(() => this.forceUpdate(), 50);
-    const e = this.state.rxData.type === "pie" ? this.getPieOption() : this.getBarOption(), i = r(c, { ref: this.refCardContent, sx: p.cardContent, children: n && r(m, { option: e, theme: this.props.themeType === "dark" ? "dark" : "", className: "vis-2-widgets-energy-chart", opts: { renderer: "svg" }, style: { height: n } }) });
+    const e = this.state.rxData.type === "pie" ? this.getPieOption() : this.getBarOption(), i = r(m, { ref: this.refCardContent, sx: p.cardContent, children: n && r(c, { option: e, theme: this.props.themeType === "dark" ? "dark" : "", className: "vis-2-widgets-energy-chart", opts: { renderer: "svg" }, style: { height: n } }) });
     return this.state.rxData.noCard || a.widget.usedInWidget ? i : this.wrapContent(i, null, { textAlign: "center" });
   }
 }

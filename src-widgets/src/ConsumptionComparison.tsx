@@ -283,6 +283,7 @@ class ConsumptionComparison extends Generic<Record<string, any>, ConsumptionComp
             backgroundColor: 'transparent',
             animation: !this.state.rxData.noAnimation,
             animationDuration: parseInt(this.state.rxData.animationDuration, 10) || 1000,
+            animationDurationUpdate: parseInt(this.state.rxData.animationDuration, 10) || 1000,
             grid: {
                 containLabel: true,
                 left: 10,
@@ -371,6 +372,7 @@ class ConsumptionComparison extends Generic<Record<string, any>, ConsumptionComp
             backgroundColor: 'transparent',
             animation: !this.state.rxData.noAnimation,
             animationDuration: parseInt(this.state.rxData.animationDuration, 10) || 1000,
+            animationDurationUpdate: parseInt(this.state.rxData.animationDuration, 10) || 1000,
             grid: {
                 left: 10,
                 top: 0,
