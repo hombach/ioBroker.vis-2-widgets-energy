@@ -494,19 +494,10 @@ class Distribution extends Generic<Record<string, any>, DistributionState> {
                             type: 'id',
                             label: 'value2',
                             tooltip: 'value2_tooltip',
-                            onChange: async (field, data, changeData, socket) => {
-                                const object = data[field.name!] ? await socket.getObject(data[field.name!]) : null;
-                                if (object?.common?.unit) {
-                                    data[`value2Unit${field.index}`] = object.common.unit;
-                                    changeData(data);
-                                }
-                            },
-                            noInit: true,
                         },
                         {
                             name: 'value2Unit',
                             label: 'value2_unit',
-                            default: '%',
                         },
                     ],
                 },
@@ -580,6 +571,12 @@ class Distribution extends Generic<Record<string, any>, DistributionState> {
             objects[idx].invert = n === true || n === 'true';
 
             units[this.state.rxData[`oid${i}`]] = objects[idx].common.unit;
+
+            // resolve OID 2's unit from its own datapoint object (#416, #74)
+            if (this.state.rxData[`value2Oid${i}`]) {
+                const value2Object = await this.loadObject(this.state.rxData[`value2Oid${i}`], true);
+                units[this.state.rxData[`value2Oid${i}`]] = value2Object?.common?.unit;
+            }
         }
         // home
         objects.home = await this.loadObject(this.state.rxData['home-oid'], this.state.rxData.homeIcon);
@@ -760,7 +757,9 @@ class Distribution extends Generic<Record<string, any>, DistributionState> {
                 value2: this.state.rxData[`value2Oid${i}`]
                     ? this.state.values[`${this.state.rxData[`value2Oid${i}`]}.val`]
                     : undefined,
-                value2Unit: this.state.rxData[`value2Unit${i}`] || '',
+                value2Unit: this.state.rxData[`value2Unit${i}`]
+                    || this.state.units[this.state.rxData[`value2Oid${i}`]]
+                    || '%',
             };
             circles.push(circle);
 
