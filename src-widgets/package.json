@@ -19,7 +19,6 @@
     },
     "devDependencies": {
         "@iobroker/types-vis-2": "^2.14.4",
-        "@module-federation/runtime": "^0.18.3",
         "@module-federation/vite": "^1.7.2",
         "@types/react": "^18.3.24",
         "@types/react-dom": "^18.3.7",
@@ -30,7 +29,7 @@
         "vite": "^7.1.12",
         "vite-plugin-commonjs": "^0.10.4",
         "vite-plugin-top-level-await": "^1.6.0",
-        "vite-tsconfig-paths": "^5.1.4"
+        "vite-tsconfig-paths": "^6.1.1"
     },
     "scripts": {
         "start": "vite --port 4173",
