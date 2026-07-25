@@ -112,7 +112,7 @@
   "Value": "Valor",
   "text_color": "Color de texto",
   "stacked": "Barras apiladas",
-  "value2": "Valor 2",
+  "value2": "OID 2",
   "value2_tooltip": "Un segundo valor en el círculo, p. ej. el estado de carga de la batería (SoC en %)",
-  "value2_unit": "Unidad valor 2"
+  "value2_unit": "OID 2 unidad"
 }

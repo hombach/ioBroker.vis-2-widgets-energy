@@ -494,6 +494,14 @@ class Distribution extends Generic<Record<string, any>, DistributionState> {
                             type: 'id',
                             label: 'value2',
                             tooltip: 'value2_tooltip',
+                            onChange: async (field, data, changeData, socket) => {
+                                const object = data[field.name!] ? await socket.getObject(data[field.name!]) : null;
+                                if (object?.common?.unit) {
+                                    data[`value2Unit${field.index}`] = object.common.unit;
+                                    changeData(data);
+                                }
+                            },
+                            noInit: true,
                         },
                         {
                             name: 'value2Unit',

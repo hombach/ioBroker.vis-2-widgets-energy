@@ -112,7 +112,7 @@
   "Value": "Waarde",
   "text_color": "Tekst kleur",
   "stacked": "Gestapelde balken",
-  "value2": "Waarde 2",
+  "value2": "OID 2",
   "value2_tooltip": "Een tweede waarde in de cirkel, bijv. de laadtoestand van een accu (SoC in %)",
-  "value2_unit": "Eenheid waarde 2"
+  "value2_unit": "OID 2 eenheid"
 }

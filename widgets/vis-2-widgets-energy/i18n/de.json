@@ -112,7 +112,7 @@
   "Value": "Wert",
   "text_color": "Textfarbe",
   "stacked": "Balken gestapelt",
-  "value2": "Wert 2",
+  "value2": "OID 2",
   "value2_tooltip": "Ein zweiter Wert im Kreis, z. B. der Batterie-Ladezustand (SoC in %)",
-  "value2_unit": "Einheit Wert 2"
+  "value2_unit": "OID 2 Einheit"
 }

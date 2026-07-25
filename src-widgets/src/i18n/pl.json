@@ -112,7 +112,7 @@
   "Value": "Wartość",
   "text_color": "Kolor tekstu",
   "stacked": "Słupki skumulowane",
-  "value2": "Wartość 2",
+  "value2": "OID 2",
   "value2_tooltip": "Druga wartość w kółku, np. stan naładowania baterii (SoC w %)",
-  "value2_unit": "Jednostka wartości 2"
+  "value2_unit": "OID 2 jednostka"
 }
