@@ -494,6 +494,8 @@ class Consumption extends Generic<Record<string, any>, ConsumptionState> {
             backgroundColor: 'transparent',
             tooltip: {},
             legend: {
+                top: 5,
+                left: 'center',
                 data: data.map(item => ({
                     name: item.name,
                     textStyle,
