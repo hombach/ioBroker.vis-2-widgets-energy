@@ -6,9 +6,9 @@ import type { RxRenderWidgetProps, RxWidgetInfo, VisRxWidgetProps, VisRxWidgetSt
 import Generic from './Generic';
 
 interface DistributionState extends VisRxWidgetState {
-    offset?: number;
-    objects?: Record<string, any>;
-    units?: Record<string, any>;
+    offset: number;
+    objects: Record<string, any>;
+    units: Record<string, any>;
     [key: string]: any;
 }
 
@@ -45,7 +45,7 @@ function polarToCartesian(
 }
 
 class Distribution extends Generic<Record<string, any>, DistributionState> {
-    private readonly refCardContent: React.RefObject<HTMLDivElement | null> = React.createRef();
+    private readonly refCardContent: React.RefObject<HTMLDivElement> = React.createRef();
 
     private lastRxData?: string;
 
@@ -121,7 +121,7 @@ class Distribution extends Generic<Record<string, any>, DistributionState> {
                             type: 'id',
                             label: 'home_oid',
                             onChange: async (field, data, changeData, socket) => {
-                                const object = await socket.getObject(data[field.name]);
+                                const object = await socket.getObject(data[field.name!]);
                                 if (object && object.common) {
                                     data.homeColor = object.common.color !== undefined ? object.common.color : null;
                                     data.homeName = Generic.getText(object.common.name);
@@ -228,7 +228,7 @@ class Distribution extends Generic<Record<string, any>, DistributionState> {
                             type: 'id',
                             label: 'power_line_oid',
                             onChange: async (field, data, changeData, socket) => {
-                                const object = await socket.getObject(data[field.name]);
+                                const object = await socket.getObject(data[field.name!]);
                                 if (object && object.common) {
                                     data.powerLineColor = object.common.color !== undefined ? object.common.color : null;
                                     data.powerLineName = Generic.getText(object.common.name);
@@ -242,7 +242,7 @@ class Distribution extends Generic<Record<string, any>, DistributionState> {
                             type: 'id',
                             label: 'power_line_return_oid',
                             onChange: async (field, data, changeData, socket) => {
-                                const object = await socket.getObject(data[field.name]);
+                                const object = await socket.getObject(data[field.name!]);
                                 if (object && object.common) {
                                     data.powerLineColor = object.common.color !== undefined ? object.common.color : null;
                                     data.powerLineName = Generic.getText(object.common.name);
@@ -375,7 +375,7 @@ class Distribution extends Generic<Record<string, any>, DistributionState> {
                             type: 'id',
                             label: 'oid',
                             onChange: async (field, data, changeData, socket) => {
-                                const object = await socket.getObject(data[field.name]);
+                                const object = await socket.getObject(data[field.name!]);
                                 if (object && object.common) {
                                     data[`color${field.index}`] = object.common.color !== undefined ? object.common.color : null;
                                     data[`name${field.index}`] = Generic.getText(object.common.name);
@@ -657,7 +657,7 @@ class Distribution extends Generic<Record<string, any>, DistributionState> {
     renderWidgetBody(props: RxRenderWidgetProps) {
         super.renderWidgetBody(props);
 
-        let size;
+        let size = 0;
         if (!this.refCardContent.current) {
             setTimeout(() => this.forceUpdate(), 50);
         } else {

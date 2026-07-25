@@ -26,9 +26,9 @@ const styles: Record<string, React.CSSProperties> = {
 };
 
 class Consumption extends Generic<Record<string, any>, ConsumptionState> {
-    private readonly refCardContent: React.RefObject<HTMLDivElement | null> = React.createRef();
+    private readonly refCardContent: React.RefObject<HTMLDivElement> = React.createRef();
 
-    private timeSelectorRegistered: boolean | string = false;
+    private timeSelectorRegistered: boolean | string | null = false;
 
     private timeSelectorRegisterInterval?: ReturnType<typeof setInterval> | null = null;
 
@@ -150,7 +150,7 @@ class Consumption extends Generic<Record<string, any>, ConsumptionState> {
                         type: 'hid',
                         label: 'oid',
                         onChange: async (field, data, changeData, socket) => {
-                            const object = await socket.getObject(data[field.name]);
+                            const object = await socket.getObject(data[field.name!]);
                             if (object && object.common) {
                                 data[`color${field.index}`]  = object.common.color !== undefined ? object.common.color : null;
                                 data[`name${field.index}`]  = object.common.name && typeof object.common.name === 'object' ? object.common.name[I18n.getLanguage()] : object.common.name;
@@ -195,7 +195,7 @@ class Consumption extends Generic<Record<string, any>, ConsumptionState> {
     getHistory(id: string, options: any) {
         if (options.timeout) {
             return new Promise(resolve => {
-                let timeout = setTimeout(() => {
+                let timeout: ReturnType<typeof setTimeout> | null = setTimeout(() => {
                     if (timeout) {
                         clearTimeout(timeout);
                         timeout = null;
@@ -360,9 +360,7 @@ class Consumption extends Generic<Record<string, any>, ConsumptionState> {
     }
 
     componentDidUpdate(prevProps: any, prevState: any): void {
-        if (super.componentDidUpdate) {
-            super.componentDidUpdate(prevProps, prevState);
-        }
+        super.componentDidUpdate(prevProps, prevState);
 
         if (this.state.rxData.timeWidget && this.props.context.views[this.props.view].widgets[this.state.rxData.timeWidget]) {
             if (this.timeSelectorRegistered && this.state.rxData.timeWidget !== this.timeSelectorRegistered) {
@@ -404,9 +402,7 @@ class Consumption extends Generic<Record<string, any>, ConsumptionState> {
             this.timeSelectorRegistered = false;
         }
 
-        if (super.componentWillUnmount) {
-            super.componentWillUnmount();
-        }
+        super.componentWillUnmount();
     }
 
     onTimeFromWidgetChanged = (event: any, value: any) => {

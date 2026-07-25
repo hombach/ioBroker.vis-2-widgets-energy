@@ -1,8 +1,8 @@
-import { _ as u } from "./_virtual_mf___mfe_internal__vis2energyWidgets__mf_owner__1__loadShare__react_mf_1_jsx_mf_2_runtime__loadShare__.js-CFKObsBr.js";
+import { _ as p } from "./_virtual_mf___mfe_internal__vis2energyWidgets__mf_owner__1__loadShare__react_mf_1_jsx_mf_2_runtime__loadShare__.js-CFKObsBr.js";
 import { o as D } from "./_virtual_mf___mfe_internal__vis2energyWidgets__mf_owner__1__loadShare__react__loadShare__.js-C7HYJM3r.js";
 import { E as I } from "./index-BIwAPpOA.js";
 import { g as v, h } from "./Utils-CEFQvMQb.js";
-import { I as S } from "./_virtual_mf___mfe_internal__vis2energyWidgets__mf_owner__1__loadShare___mf_0_iobroker_mf_1_adapter_mf_2_react_mf_2_v5__loadShare__.js-BdPsfiJc.js";
+import { I as S } from "./_virtual_mf___mfe_internal__vis2energyWidgets__mf_owner__1__loadShare___mf_0_iobroker_mf_1_adapter_mf_2_react_mf_2_v5__loadShare__.js-D9hGLxGk.js";
 import { G as w } from "./Generic-BqkVmzeM.js";
 import "./_virtual_mf___mfe_internal__vis2energyWidgets__mf_owner__1__loadShare___mf_0_mui_mf_1_material__loadShare__.js-D3v0E93H.js";
 import "./_virtual_mf___mfe_internal__vis2energyWidgets__mf_owner__1__loadShare___mf_0_mui_mf_1_icons_mf_2_material__loadShare__.js-CyCVg1DT.js";
@@ -57,7 +57,7 @@ class x extends w {
             const o = [];
             m[`history${l}`] = o;
             for (let n = 0; n < a.length - 1; n++) {
-              const c = a[n].getTime(), T = a[n + 1].getTime(), f = g.find((p) => p.ts >= c && p.ts < T);
+              const c = a[n].getTime(), T = a[n + 1].getTime(), f = g.find((u) => u.ts >= c && u.ts < T);
               f ? (s !== null ? o.push({ ts: a[n].getTime(), val: f.val - s.val }) : o.push({ ts: a[n].getTime(), val: 0 }), s = f) : o.push({ ts: a[n].getTime(), val: 0 });
             }
           } else m[`history${l}`] = a.map((s) => {
@@ -85,11 +85,11 @@ class x extends w {
   }
   componentDidUpdate(t, e) {
     var _a;
-    super.componentDidUpdate && super.componentDidUpdate(t, e), this.state.rxData.timeWidget && this.props.context.views[this.props.view].widgets[this.state.rxData.timeWidget] && (this.timeSelectorRegistered && this.state.rxData.timeWidget !== this.timeSelectorRegistered && ((_a = this.getTimeWidget(this.timeSelectorRegistered)) == null ? void 0 : _a._removeEventHandler(this.onTimeFromWidgetChanged), this.timeSelectorRegistered = null, this.timeSelectorRegisterInterval && clearInterval(this.timeSelectorRegisterInterval), this.timeSelectorRegisterInterval = null), this.registerTimeSelector()), this.props.context.timeStart !== t.context.timeStart ? this.readCharts() : this.props.context.timeInterval !== t.context.timeInterval && this.readCharts(), !this.getTimeStart() && !this.chartUpdateInterval && (this.chartUpdateInterval = setInterval(() => this.readCharts(), 1e3 * 60 * 10)), this.getTimeStart() && this.chartUpdateInterval && (clearInterval(this.chartUpdateInterval), this.chartUpdateInterval = null);
+    super.componentDidUpdate(t, e), this.state.rxData.timeWidget && this.props.context.views[this.props.view].widgets[this.state.rxData.timeWidget] && (this.timeSelectorRegistered && this.state.rxData.timeWidget !== this.timeSelectorRegistered && ((_a = this.getTimeWidget(this.timeSelectorRegistered)) == null ? void 0 : _a._removeEventHandler(this.onTimeFromWidgetChanged), this.timeSelectorRegistered = null, this.timeSelectorRegisterInterval && clearInterval(this.timeSelectorRegisterInterval), this.timeSelectorRegisterInterval = null), this.registerTimeSelector()), this.props.context.timeStart !== t.context.timeStart ? this.readCharts() : this.props.context.timeInterval !== t.context.timeInterval && this.readCharts(), !this.getTimeStart() && !this.chartUpdateInterval && (this.chartUpdateInterval = setInterval(() => this.readCharts(), 1e3 * 60 * 10)), this.getTimeStart() && this.chartUpdateInterval && (clearInterval(this.chartUpdateInterval), this.chartUpdateInterval = null);
   }
   componentWillUnmount() {
     var _a;
-    this.timeSelectorRegisterInterval && clearInterval(this.timeSelectorRegisterInterval), this.timeSelectorRegisterInterval = null, this.readTimer && clearTimeout(this.readTimer), this.readTimer = null, this.chartUpdateInterval && clearInterval(this.chartUpdateInterval), this.chartUpdateInterval = null, this.timeSelectorRegistered && ((_a = this.getTimeWidget(this.timeSelectorRegistered)) == null ? void 0 : _a._removeEventHandler(this.onTimeFromWidgetChanged), this.timeSelectorRegistered = false), super.componentWillUnmount && super.componentWillUnmount();
+    this.timeSelectorRegisterInterval && clearInterval(this.timeSelectorRegisterInterval), this.timeSelectorRegisterInterval = null, this.readTimer && clearTimeout(this.readTimer), this.readTimer = null, this.chartUpdateInterval && clearInterval(this.chartUpdateInterval), this.chartUpdateInterval = null, this.timeSelectorRegistered && ((_a = this.getTimeWidget(this.timeSelectorRegistered)) == null ? void 0 : _a._removeEventHandler(this.onTimeFromWidgetChanged), this.timeSelectorRegistered = false), super.componentWillUnmount();
   }
   onTimeFromWidgetChanged = (t, e) => {
     if (t === "unmount") {
@@ -134,7 +134,7 @@ class x extends w {
     super.renderWidgetBody(t);
     let e;
     this.refCardContent.current ? e = this.refCardContent.current.offsetHeight : setTimeout(() => this.forceUpdate(), 50);
-    const r = u("div", { ref: this.refCardContent, style: C.cardContent, children: e && u(I, { option: this.getOption(), theme: this.props.themeType === "dark" ? "dark" : "", style: { height: `${e}px`, width: "100%" }, opts: { renderer: "svg" } }) });
+    const r = p("div", { ref: this.refCardContent, style: C.cardContent, children: e && p(I, { option: this.getOption(), theme: this.props.themeType === "dark" ? "dark" : "", style: { height: `${e}px`, width: "100%" }, opts: { renderer: "svg" } }) });
     return this.state.rxData.noCard || t.widget.usedInWidget ? r : this.wrapContent(r, null, { textAlign: "center" });
   }
 }

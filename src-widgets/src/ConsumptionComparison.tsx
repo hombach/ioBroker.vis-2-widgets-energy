@@ -75,7 +75,7 @@ class ConsumptionComparison extends Generic<Record<string, any>, ConsumptionComp
                             type: 'id',
                             hidden: 'data.type !== "pie"',
                             onChange: async (field, data, changeData, socket) => {
-                                const object = data[field.name] ? (await socket.getObject(data[field.name])) : null;
+                                const object = data[field.name!] ? (await socket.getObject(data[field.name!])) : null;
                                 if (object?.common?.unit) {
                                     data.innerUnit = object.common.unit;
                                     changeData(data);
@@ -143,7 +143,7 @@ class ConsumptionComparison extends Generic<Record<string, any>, ConsumptionComp
                             type: 'id',
                             label: 'oid',
                             onChange: async (field, data, changeData, socket) => {
-                                const object = data[field.name] ? (await socket.getObject(data[field.name])) : null;
+                                const object = data[field.name!] ? (await socket.getObject(data[field.name!])) : null;
                                 if (object?.common) {
                                     data[`color${field.index}`] = object.common.color !== undefined ? object.common.color : null;
                                     data[`name${field.index}`] = Generic.getText(object.common.name);

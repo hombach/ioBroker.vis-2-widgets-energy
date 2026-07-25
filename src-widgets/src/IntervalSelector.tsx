@@ -36,7 +36,7 @@ const styles: Record<string, React.CSSProperties> = {
 };
 
 class IntervalSelector extends Generic<Record<string, any>, IntervalSelectorState> {
-    private readonly refTimeSelector: React.RefObject<HTMLDivElement | null> = React.createRef();
+    private readonly refTimeSelector: React.RefObject<HTMLDivElement> = React.createRef();
 
     private eventHandlers: EventHandler[] = [];
 

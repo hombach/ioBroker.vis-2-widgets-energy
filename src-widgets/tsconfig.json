@@ -5,11 +5,7 @@
         "lib": ["DOM", "DOM.Iterable", "ESNext"],
         "skipLibCheck": true,
         "esModuleInterop": true,
-        // Strictness is tightened incrementally after the JS->TS migration.
-        // strict is on; strictNullChecks is still opted out (enabled in a
-        // follow-up step).
         "strict": true,
-        "strictNullChecks": false,
         "forceConsistentCasingInFileNames": true,
         "module": "ESNext",
         "moduleResolution": "Bundler",
