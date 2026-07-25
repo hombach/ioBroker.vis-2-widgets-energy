@@ -4,7 +4,7 @@ import ReactEchartsCore from 'echarts-for-react';
 import moment from 'moment';
 
 import { I18n } from '@iobroker/adapter-react-v5';
-import type { RxWidgetInfo, VisRxWidgetState } from '@iobroker/types-vis-2';
+import type { RxRenderWidgetProps, RxWidgetInfo, VisRxWidgetState } from '@iobroker/types-vis-2';
 
 import Generic from './Generic';
 import { getFromToTime } from './Utils';
@@ -192,7 +192,7 @@ class Consumption extends Generic<Record<string, any>, ConsumptionState> {
         return null;
     }
 
-    getHistory(id: any, options: any) {
+    getHistory(id: string, options: any) {
         if (options.timeout) {
             return new Promise(resolve => {
                 let timeout = setTimeout(() => {
@@ -223,7 +223,7 @@ class Consumption extends Generic<Record<string, any>, ConsumptionState> {
         const intervalType = this.getTimeInterval();
         const interval = getFromToTime(this.getTimeStart(), intervalType);
 
-        const types: Record<string, any> = {
+        const types: Record<string, { count: number; format: string }> = {
             year: {
                 count: 12,
                 format: 'MMM',
@@ -464,7 +464,7 @@ class Consumption extends Generic<Record<string, any>, ConsumptionState> {
             });
         }
 
-        const timeTypes: Record<string, any> = {
+        const timeTypes: Record<string, string> = {
             year: 'MMM',
             month: 'DD.MM',
             week: 'ddd',
@@ -549,7 +549,7 @@ class Consumption extends Generic<Record<string, any>, ConsumptionState> {
         return result;
     }
 
-    renderWidgetBody(props: any) {
+    renderWidgetBody(props: RxRenderWidgetProps) {
         super.renderWidgetBody(props);
 
         let size;

@@ -3,7 +3,7 @@ import moment from 'moment';
 
 import { Button, ButtonGroup, IconButton } from '@mui/material';
 import { NavigateBefore as NavigateBeforeIcon, NavigateNext as NavigateNextIcon } from '@mui/icons-material';
-import type { RxWidgetInfo, VisRxWidgetState } from '@iobroker/types-vis-2';
+import type { RxRenderWidgetProps, RxWidgetInfo, VisRxWidgetState } from '@iobroker/types-vis-2';
 import Generic from './Generic';
 import { getFromToTime } from './Utils';
 
@@ -135,11 +135,11 @@ class IntervalSelector extends Generic<Record<string, any>, IntervalSelectorStat
             this.props.context.timeStart;
     }
 
-    setTimeStart = (timeStart: any) => {
+    setTimeStart = (timeStart: number | null) => {
         if (this.state.rxData['timeStart-oid']) {
             this.props.context.setValue(this.state.rxData['timeStart-oid'], timeStart);
         } else {
-            this.props.context.setTimeStart(timeStart);
+            this.props.context.setTimeStart(timeStart as any);
             this.informSubscribers(timeStart);
         }
     };
@@ -173,7 +173,7 @@ class IntervalSelector extends Generic<Record<string, any>, IntervalSelectorStat
         }, 100);
     }
 
-    onStateUpdated(id: any, state: any) {
+    onStateUpdated(id: string, state: ioBroker.State) {
         if (id === this.state.rxData['timeInterval-oid']) {
             this.informSubscribers(null, state.val);
         } else if (id === this.state.rxData['timeStart-oid']) {
@@ -181,7 +181,7 @@ class IntervalSelector extends Generic<Record<string, any>, IntervalSelectorStat
         }
     }
 
-    setTimeInterval = (timeInterval: any) => {
+    setTimeInterval = (timeInterval: string) => {
         if (this.state.rxData['timeInterval-oid']) {
             this.props.context.setValue(this.state.rxData['timeInterval-oid'], timeInterval);
         } else {
@@ -190,7 +190,7 @@ class IntervalSelector extends Generic<Record<string, any>, IntervalSelectorStat
         }
     };
 
-    renderWidgetBody(props: any) {
+    renderWidgetBody(props: RxRenderWidgetProps) {
         super.renderWidgetBody(props);
 
         let periodName: React.ReactNode = '';

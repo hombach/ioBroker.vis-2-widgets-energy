@@ -2,7 +2,7 @@ import React from 'react';
 import { Box } from '@mui/material';
 
 import ReactEchartsCore from 'echarts-for-react';
-import type { RxWidgetInfo, VisRxWidgetState } from '@iobroker/types-vis-2';
+import type { RxRenderWidgetProps, RxWidgetInfo, VisRxWidgetState } from '@iobroker/types-vis-2';
 import Generic from './Generic';
 
 interface ConsumptionComparisonState extends VisRxWidgetState {
@@ -395,7 +395,7 @@ class ConsumptionComparison extends Generic<Record<string, any>, ConsumptionComp
         };
     }
 
-    renderWidgetBody(props: any) {
+    renderWidgetBody(props: RxRenderWidgetProps) {
         super.renderWidgetBody(props);
 
         let size;

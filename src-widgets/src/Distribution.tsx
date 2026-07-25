@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { Icon, Utils } from '@iobroker/adapter-react-v5';
-import type { RxWidgetInfo, VisRxWidgetProps, VisRxWidgetState } from '@iobroker/types-vis-2';
+import type { RxRenderWidgetProps, RxWidgetInfo, VisRxWidgetProps, VisRxWidgetState } from '@iobroker/types-vis-2';
 
 import Generic from './Generic';
 
@@ -501,7 +501,7 @@ class Distribution extends Generic<Record<string, any>, DistributionState> {
         };
     }
 
-    async loadObject(oid: any, iconExists: any) {
+    async loadObject(oid: string, iconExists: boolean) {
         if (oid) {
             // read object itself
             const object = await this.props.context.socket.getObject(oid);
@@ -654,7 +654,7 @@ class Distribution extends Generic<Record<string, any>, DistributionState> {
         };
     }
 
-    renderWidgetBody(props: any) {
+    renderWidgetBody(props: RxRenderWidgetProps) {
         super.renderWidgetBody(props);
 
         let size;
