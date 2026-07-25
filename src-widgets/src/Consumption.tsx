@@ -171,6 +171,13 @@ class Consumption extends Generic<Record<string, any>, ConsumptionState> {
                         name: 'unit',
                         label: 'unit',
                     },
+                    {
+                        name: 'factor',
+                        label: 'factor',
+                        type: 'number',
+                        default: 1,
+                        tooltip: 'factor_tooltip',
+                    },
                 ],
             }],
             visDefaultStyle: {
@@ -451,12 +458,18 @@ class Consumption extends Generic<Record<string, any>, ConsumptionState> {
      */
     getOption() {
         const data = [];
+        // use the first configured device unit as the y-axis label (#451)
+        let axisUnit = '';
         for (let i = 1; i <= this.state.rxData.devicesCount; i++) {
+            if (!axisUnit && this.state.rxData[`unit${i}`]) {
+                axisUnit = this.state.rxData[`unit${i}`];
+            }
             data.push({
                 name: this.state.rxData[`name${i}`] || '',
                 value: this.state.values[`${this.state.rxData[`oid${i}`]}.val`] || '',
                 values: this.state[`history${i}`] || [],
                 color: this.state.rxData[`color${i}`] || '',
+                factor: parseFloat(this.state.rxData[`factor${i}`]) || 1,
             });
         }
 
@@ -495,7 +508,7 @@ class Consumption extends Generic<Record<string, any>, ConsumptionState> {
                 right: 10,
                 bottom: 10,
             },
-            yAxis: { },
+            yAxis: { name: axisUnit },
             xAxis: {
                 type: 'category',
                 data: data?.[0]?.values?.map((dateValue: any) => moment(dateValue.ts).format(
@@ -509,7 +522,7 @@ class Consumption extends Generic<Record<string, any>, ConsumptionState> {
                     itemStyle: {
                         color: item.color,
                     },
-                    data: item.values?.map((dateValue: any) => dateValue.val),
+                    data: item.values?.map((dateValue: any) => dateValue.val * item.factor),
                     stack: 'one',
                 }
             )),
