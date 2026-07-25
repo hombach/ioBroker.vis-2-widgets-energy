@@ -111,5 +111,8 @@
   "difference_tooltip": "Het verschil tussen twee waarden wordt gebruikt. Handig voor tellers.",
   "Value": "Waarde",
   "text_color": "Tekst kleur",
-  "stacked": "Gestapelde balken"
+  "stacked": "Gestapelde balken",
+  "value2": "Waarde 2",
+  "value2_tooltip": "Een tweede waarde in de cirkel, bijv. de laadtoestand van een accu (SoC in %)",
+  "value2_unit": "Eenheid waarde 2"
 }

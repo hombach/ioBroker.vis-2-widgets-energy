@@ -111,5 +111,8 @@
   "difference_tooltip": "Verrà utilizzata la differenza tra due valori. Utile per i contatori.",
   "Value": "Valore",
   "text_color": "Colore del testo",
-  "stacked": "Barre impilate"
+  "stacked": "Barre impilate",
+  "value2": "Valore 2",
+  "value2_tooltip": "Un secondo valore nel cerchio, es. lo stato di carica della batteria (SoC in %)",
+  "value2_unit": "Unità valore 2"
 }

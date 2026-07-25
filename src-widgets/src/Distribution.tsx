@@ -489,6 +489,17 @@ class Distribution extends Generic<Record<string, any>, DistributionState> {
                             default: 50,
                             label: 'motion_speed',
                         },
+                        {
+                            name: 'value2Oid',
+                            type: 'id',
+                            label: 'value2',
+                            tooltip: 'value2_tooltip',
+                        },
+                        {
+                            name: 'value2Unit',
+                            label: 'value2_unit',
+                            default: '%',
+                        },
                     ],
                 },
             ],
@@ -738,6 +749,10 @@ class Distribution extends Generic<Record<string, any>, DistributionState> {
                 invert: (this.state.objects[idx] && this.state.objects[idx].invert) || false,
                 speed: parseFloat(this.state.objects[idx] && this.state.objects[idx].speed) || 50,
                 textColor: this.state.rxData[`textColor${i}`],
+                value2: this.state.rxData[`value2Oid${i}`]
+                    ? this.state.values[`${this.state.rxData[`value2Oid${i}`]}.val`]
+                    : undefined,
+                value2Unit: this.state.rxData[`value2Unit${i}`] || '',
             };
             circles.push(circle);
 
@@ -825,6 +840,9 @@ class Distribution extends Generic<Record<string, any>, DistributionState> {
                             </div> : null}
                             {circle.value !== undefined ? <div>
                                 {`${circle.arrow}${circle.value} ${circle.unit}`}
+                            </div> : null}
+                            {circle.value2 !== undefined && circle.value2 !== null ? <div>
+                                {`${circle.value2}${circle.value2Unit ? ` ${circle.value2Unit}` : ''}`}
                             </div> : null}
                         </div>
                         <div
