@@ -27,9 +27,9 @@ This widget set consists of the following widgets:
 ## Changelog
 
 ### **WORK IN PROGRESS**
+* (hombach) **BREAKING:** the comparison widget no longer auto-converts W→Wh / kW→kWh nor divides Wh values by 1000. It now shows the real datapoint unit and raw value; use the "factor" field for scaling (#243)
 * (hombach) Consumption widget: added a per-device factor and a y-axis unit label (#451)
 * (hombach) Consumption widget: added a "stacked" option to preselect stacked vs grouped bars (#451)
-* (hombach) **BREAKING:** the comparison widget no longer auto-converts W→Wh / kW→kWh nor divides Wh values by 1000. It now shows the real datapoint unit and raw value; use the "factor" field for scaling (#243)
 * (hombach) Migrated the widget sources from JavaScript/JSX to TypeScript
 * (hombach) Migrated the widget build from Create React App (react-scripts/craco) to Vite with module federation
 * (hombach) Fixed broken `check` and `lint` scripts (added tsconfig files, repaired ESLint flat config for JSX sources)
