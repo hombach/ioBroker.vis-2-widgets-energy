@@ -114,5 +114,7 @@
   "stacked": "Gestapelde balken",
   "value2": "OID 2",
   "value2_tooltip": "Een tweede waarde in de cirkel, bijv. de laadtoestand van een accu (SoC in %)",
-  "value2_unit": "OID 2 eenheid"
+  "value2_unit": "OID 2 eenheid",
+  "no_animation": "Geen animatie",
+  "animation_duration": "Animatieduur (ms)"
 }

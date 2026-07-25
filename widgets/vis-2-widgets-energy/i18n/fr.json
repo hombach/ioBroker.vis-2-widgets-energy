@@ -114,5 +114,7 @@
   "stacked": "Barres empilées",
   "value2": "OID 2",
   "value2_tooltip": "Une deuxième valeur dans le cercle, p. ex. l'état de charge d'une batterie (SoC en %)",
-  "value2_unit": "OID 2 unité"
+  "value2_unit": "OID 2 unité",
+  "no_animation": "Pas d'animation",
+  "animation_duration": "Durée de l'animation (ms)"
 }

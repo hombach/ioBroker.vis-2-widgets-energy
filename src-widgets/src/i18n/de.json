@@ -114,5 +114,7 @@
   "stacked": "Balken gestapelt",
   "value2": "OID 2",
   "value2_tooltip": "Ein zweiter Wert im Kreis, z. B. der Batterie-Ladezustand (SoC in %)",
-  "value2_unit": "OID 2 Einheit"
+  "value2_unit": "OID 2 Einheit",
+  "no_animation": "Keine Animation",
+  "animation_duration": "Animationsdauer (ms)"
 }

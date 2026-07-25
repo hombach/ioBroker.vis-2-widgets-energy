@@ -56,6 +56,18 @@ class ConsumptionComparison extends Generic<Record<string, any>, ConsumptionComp
                             default: 'bar',
                         },
                         {
+                            name: 'noAnimation',
+                            label: 'no_animation',
+                            type: 'checkbox',
+                        },
+                        {
+                            name: 'animationDuration',
+                            label: 'animation_duration',
+                            type: 'number',
+                            default: 1000,
+                            hidden: (data: any) => !!data.noAnimation,
+                        },
+                        {
                             name: 'innerRadius',
                             label: 'inner_radius',
                             type: 'slider',
@@ -269,6 +281,8 @@ class ConsumptionComparison extends Generic<Record<string, any>, ConsumptionComp
                 show: false,
             },
             backgroundColor: 'transparent',
+            animation: !this.state.rxData.noAnimation,
+            animationDuration: parseInt(this.state.rxData.animationDuration, 10) || 1000,
             grid: {
                 containLabel: true,
                 left: 10,
@@ -355,6 +369,8 @@ class ConsumptionComparison extends Generic<Record<string, any>, ConsumptionComp
             },
             title,
             backgroundColor: 'transparent',
+            animation: !this.state.rxData.noAnimation,
+            animationDuration: parseInt(this.state.rxData.animationDuration, 10) || 1000,
             grid: {
                 left: 10,
                 top: 0,

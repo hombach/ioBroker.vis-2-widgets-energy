@@ -114,5 +114,7 @@
   "stacked": "堆叠柱状图",
   "value2": "OID 2",
   "value2_tooltip": "圆圈中显示的第二个值，例如电池的充电状态（SoC，%）",
-  "value2_unit": "OID 2 单位"
+  "value2_unit": "OID 2 单位",
+  "no_animation": "无动画",
+  "animation_duration": "动画时长（毫秒）"
 }

@@ -114,5 +114,7 @@
   "stacked": "Barre impilate",
   "value2": "OID 2",
   "value2_tooltip": "Un secondo valore nel cerchio, es. lo stato di carica della batteria (SoC in %)",
-  "value2_unit": "OID 2 unità"
+  "value2_unit": "OID 2 unità",
+  "no_animation": "Nessuna animazione",
+  "animation_duration": "Durata animazione (ms)"
 }
