@@ -1,0 +1,2 @@
+# Normalize line endings to LF; stops CRLF churn from core.autocrlf on Windows
+* text=auto eol=lf
