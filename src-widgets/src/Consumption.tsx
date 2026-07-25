@@ -76,14 +76,14 @@ class Consumption extends Generic<Record<string, any>, ConsumptionState> {
                     {
                         name: 'start-oid',
                         type: 'id',
-                        hidden: data => !!data.timeWidget,
+                        hidden: (data: any) => !!data.timeWidget,
                         label: 'start_oid',
                         tooltip: 'start_oid_tooltip',
                     },
                     {
                         name: 'interval-oid',
                         type: 'id',
-                        hidden: data => !data['start-oid'] || !!data.timeWidget,
+                        hidden: (data: any) => !data['start-oid'] || !!data.timeWidget,
                         label: 'interval_oid',
                         tooltip: 'start_oid_tooltip',
                     },
@@ -106,28 +106,28 @@ class Consumption extends Generic<Record<string, any>, ConsumptionState> {
                         label: 'difference',
                         type: 'checkbox',
                         tooltip: 'difference_tooltip',
-                        hidden: data => data.aggregate !== 'max' && data.aggregate !== 'min' && data.aggregate !== 'average' && data.aggregate !== 'none' && data.aggregate !== 'integral',
+                        hidden: (data: any) => data.aggregate !== 'max' && data.aggregate !== 'min' && data.aggregate !== 'average' && data.aggregate !== 'none' && data.aggregate !== 'integral',
                     },
                     {
                         name: 'percentile',
                         default: 50,
                         type: 'number',
                         label: 'percentile',
-                        hidden: data => data.aggregate !== 'percentile',
+                        hidden: (data: any) => data.aggregate !== 'percentile',
                     },
                     {
                         name: 'quantile',
                         default: 0.5,
                         type: 'number',
                         label: 'quantile',
-                        hidden: data => data.aggregate !== 'quantile',
+                        hidden: (data: any) => data.aggregate !== 'quantile',
                     },
                     {
                         name: 'integralUnit',
                         default: 60,
                         type: 'number',
                         label: 'integral_unit',
-                        hidden: data => data.aggregate !== 'integral',
+                        hidden: (data: any) => data.aggregate !== 'integral',
                     },
                     {
                         name: 'integralInterpolation',
@@ -135,7 +135,7 @@ class Consumption extends Generic<Record<string, any>, ConsumptionState> {
                         type: 'select',
                         options: ['linear', 'none'],
                         label: 'integral_interpolation',
-                        hidden: data => data.aggregate !== 'integral',
+                        hidden: (data: any) => data.aggregate !== 'integral',
                     },
                 ],
             },
@@ -192,7 +192,7 @@ class Consumption extends Generic<Record<string, any>, ConsumptionState> {
         return null;
     }
 
-    getHistory(id, options) {
+    getHistory(id: any, options: any) {
         if (options.timeout) {
             return new Promise(resolve => {
                 let timeout = setTimeout(() => {
@@ -223,7 +223,7 @@ class Consumption extends Generic<Record<string, any>, ConsumptionState> {
         const intervalType = this.getTimeInterval();
         const interval = getFromToTime(this.getTimeStart(), intervalType);
 
-        const types = {
+        const types: Record<string, any> = {
             year: {
                 count: 12,
                 format: 'MMM',
@@ -282,7 +282,7 @@ class Consumption extends Generic<Record<string, any>, ConsumptionState> {
 
         this.setState({ loading: true }, async () => {
             if (interval.from !== interval.to) {
-                const newState = { loading: false };
+                const newState: Record<string, any> = { loading: false };
                 const format = types[this.getTimeInterval()].format;
 
                 for (let i = 1; i <= this.state.rxData.devicesCount; i++) {
@@ -299,7 +299,7 @@ class Consumption extends Generic<Record<string, any>, ConsumptionState> {
 
                         if (this.state.rxData.difference) {
                             let lastValue = history.findLast(item => item.ts < times[0].getTime()) || null;
-                            const data = [];
+                            const data: any[] = [];
                             newState[`history${i}`] = data;
                             for (let t = 0; t < times.length - 1; t++) {
                                 const actual = times[t].getTime();
@@ -409,7 +409,7 @@ class Consumption extends Generic<Record<string, any>, ConsumptionState> {
         }
     }
 
-    onTimeFromWidgetChanged = (event, value) => {
+    onTimeFromWidgetChanged = (event: any, value: any) => {
         if (event === 'unmount') {
             if (this.timeSelectorRegistered) {
                 const el = window.document.getElementById(this.state.rxData.timeWidget);
@@ -464,7 +464,7 @@ class Consumption extends Generic<Record<string, any>, ConsumptionState> {
             });
         }
 
-        const timeTypes = {
+        const timeTypes: Record<string, any> = {
             year: 'MMM',
             month: 'DD.MM',
             week: 'ddd',
@@ -502,7 +502,7 @@ class Consumption extends Generic<Record<string, any>, ConsumptionState> {
             yAxis: { },
             xAxis: {
                 type: 'category',
-                data: data?.[0]?.values?.map(dateValue => moment(dateValue.ts).format(
+                data: data?.[0]?.values?.map((dateValue: any) => moment(dateValue.ts).format(
                     timeTypes[this.getTimeInterval()],
                 )),
             },
@@ -513,7 +513,7 @@ class Consumption extends Generic<Record<string, any>, ConsumptionState> {
                     itemStyle: {
                         color: item.color,
                     },
-                    data: item.values?.map(dateValue => dateValue.val),
+                    data: item.values?.map((dateValue: any) => dateValue.val),
                     stack: 'one',
                 }
             )),
@@ -549,7 +549,7 @@ class Consumption extends Generic<Record<string, any>, ConsumptionState> {
         return result;
     }
 
-    renderWidgetBody(props) {
+    renderWidgetBody(props: any) {
         super.renderWidgetBody(props);
 
         let size;

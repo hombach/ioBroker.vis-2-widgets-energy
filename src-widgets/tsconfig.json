@@ -6,10 +6,9 @@
         "skipLibCheck": true,
         "esModuleInterop": true,
         // Strictness is tightened incrementally after the JS->TS migration.
-        // strict is on; the two heaviest flags are still opted out and will be
-        // enabled one at a time in follow-up steps.
+        // strict is on; strictNullChecks is still opted out (enabled in a
+        // follow-up step).
         "strict": true,
-        "noImplicitAny": false,
         "strictNullChecks": false,
         "forceConsistentCasingInFileNames": true,
         "module": "ESNext",

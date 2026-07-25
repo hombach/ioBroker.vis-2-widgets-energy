@@ -135,7 +135,7 @@ class IntervalSelector extends Generic<Record<string, any>, IntervalSelectorStat
             this.props.context.timeStart;
     }
 
-    setTimeStart = timeStart => {
+    setTimeStart = (timeStart: any) => {
         if (this.state.rxData['timeStart-oid']) {
             this.props.context.setValue(this.state.rxData['timeStart-oid'], timeStart);
         } else {
@@ -173,7 +173,7 @@ class IntervalSelector extends Generic<Record<string, any>, IntervalSelectorStat
         }, 100);
     }
 
-    onStateUpdated(id, state) {
+    onStateUpdated(id: any, state: any) {
         if (id === this.state.rxData['timeInterval-oid']) {
             this.informSubscribers(null, state.val);
         } else if (id === this.state.rxData['timeStart-oid']) {
@@ -181,7 +181,7 @@ class IntervalSelector extends Generic<Record<string, any>, IntervalSelectorStat
         }
     }
 
-    setTimeInterval = timeInterval => {
+    setTimeInterval = (timeInterval: any) => {
         if (this.state.rxData['timeInterval-oid']) {
             this.props.context.setValue(this.state.rxData['timeInterval-oid'], timeInterval);
         } else {
@@ -190,7 +190,7 @@ class IntervalSelector extends Generic<Record<string, any>, IntervalSelectorStat
         }
     };
 
-    renderWidgetBody(props) {
+    renderWidgetBody(props: any) {
         super.renderWidgetBody(props);
 
         let periodName: React.ReactNode = '';

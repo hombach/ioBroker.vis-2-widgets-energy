@@ -236,7 +236,7 @@ class ConsumptionComparison extends Generic<Record<string, any>, ConsumptionComp
      * @returns {echarts.EChartsOption}
      */
     getBarOption() {
-        const data = [];
+        const data: any[] = [];
         for (let i = 1; i <= this.state.rxData.devicesCount; i++) {
             let value = this.state.values[`${this.state.rxData[`oid${i}`]}.val`] || 0;
             if (this.state.rxData[`factor${i}`] && this.state.rxData[`factor${i}`] !== 1) {
@@ -260,7 +260,7 @@ class ConsumptionComparison extends Generic<Record<string, any>, ConsumptionComp
         return {
             tooltip: {
                 // formatter: '{b}: {c} kWh',
-                formatter: (params /* , ticket, callback */) => `${params.name}: ${params.data.value}${this.state.units && this.state.units[params.dataIndex + 1] ? ` ${this.state.units[params.dataIndex + 1]}` : ''}`,
+                formatter: (params: any /* , ticket, callback */) => `${params.name}: ${params.data.value}${this.state.units && this.state.units[params.dataIndex + 1] ? ` ${this.state.units[params.dataIndex + 1]}` : ''}`,
             },
             title:{
                 show: false,
@@ -297,7 +297,7 @@ class ConsumptionComparison extends Generic<Record<string, any>, ConsumptionComp
      * @returns {echarts.EChartsOption}
      */
     getPieOption() {
-        const data = [];
+        const data: any[] = [];
         for (let i = 1; i <= this.state.rxData.devicesCount; i++) {
             let value = this.state.values[`${this.state.rxData[`oid${i}`]}.val`] || 0;
             this.state.rxData[`factor${i}`] = parseFloat(this.state.rxData[`factor${i}`]) || 1;
@@ -351,7 +351,7 @@ class ConsumptionComparison extends Generic<Record<string, any>, ConsumptionComp
         return {
             tooltip: {
                 trigger: 'item',
-                formatter: params => `${params.name}: ${params.data.value}${this.state.units && this.state.units[params.dataIndex + 1] ? ` ${this.state.units[params.dataIndex + 1]}` : ''}`,
+                formatter: (params: any) => `${params.name}: ${params.data.value}${this.state.units && this.state.units[params.dataIndex + 1] ? ` ${this.state.units[params.dataIndex + 1]}` : ''}`,
             },
             title,
             backgroundColor: 'transparent',
@@ -371,7 +371,7 @@ class ConsumptionComparison extends Generic<Record<string, any>, ConsumptionComp
                 show: this.state.rxData.legend,
                 bottom: 0,
                 left: 'center',
-                formatter: name => {
+                formatter: (name: any) => {
                     const i = data.findIndex(item => item.name === name);
                     return `${name}: ${data[i].value}${this.state.units && this.state.units[i + 1] ? ` ${this.state.units[i + 1]}` : ''}`;
                 },
@@ -395,7 +395,7 @@ class ConsumptionComparison extends Generic<Record<string, any>, ConsumptionComp
         };
     }
 
-    renderWidgetBody(props) {
+    renderWidgetBody(props: any) {
         super.renderWidgetBody(props);
 
         let size;
