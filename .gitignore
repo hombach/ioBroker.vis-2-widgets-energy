@@ -7,3 +7,5 @@
 /widgets
 /tmp
 *.tgz
+tmp_*.log
+.commitinfo
