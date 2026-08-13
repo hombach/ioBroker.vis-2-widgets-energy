@@ -49,9 +49,10 @@ This widget set consists of the following widgets:
 * (hombach) Removed deprecated common.noConfig from io-package.json (#499)
 * (hombach) Fixed build failure by removing deprecated node-sass dependency
 * (hombach) testing for node.js 24 (#383)
-* (hombach) updated github actions
+* (hombach) updated GitHub actions
 * (hombach) updated dependencies
 * (hombach) fixed repo checker warnings
+* (@GermanBluefox) Refactored the code
 
 ### 1.0.2 (2024-08-06)
 * (bluefox) updated packages

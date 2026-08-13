@@ -148,6 +148,11 @@
         ]
       }
     },
+    "dependencies": [
+      {
+        "vis-2": ">=2.12.8"
+      }
+    ],
     "restartAdapters": [
       "vis-2"
     ],

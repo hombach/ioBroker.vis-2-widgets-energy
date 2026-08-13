@@ -1,15 +1,118 @@
 import React from 'react';
 
 import { Icon, Utils } from '@iobroker/adapter-react-v5';
-import type { RxRenderWidgetProps, RxWidgetInfo, VisRxWidgetProps, VisRxWidgetState } from '@iobroker/types-vis-2';
+import type {
+    RxRenderWidgetProps,
+    RxWidgetInfo,
+    VisRxData,
+    VisRxWidgetProps,
+    VisRxWidgetState,
+    WidgetData,
+} from '@iobroker/types-vis-2';
 
 import Generic from './Generic';
 
+type StoredObject = {
+    common: ioBroker.StateCommon;
+    _id?: string;
+    factor?: number;
+    round?: number;
+    speed?: number | string;
+    hideIfLess?: number | null;
+    invert?: boolean;
+};
+
+interface Circle {
+    name: string;
+    color?: string;
+    radius: number;
+    distance: number;
+    fontSize: number;
+    oid: string;
+    unit: string;
+    value?: string;
+    iValue: number;
+    icon?: string;
+    arrow: '→' | '←' | '';
+    iconSize: number;
+    hide?: boolean;
+    invert: boolean;
+    speed: number;
+    textColor: string;
+    value2?: number;
+    value2Unit?: string;
+    secondaryValue?: { value?: string; unit?: string; iValue: number } | null;
+    secondaryArrow?: '→' | '←' | '';
+}
+
 interface DistributionState extends VisRxWidgetState {
     offset: number;
-    objects: Record<string, any>;
-    units: Record<string, any>;
-    [key: string]: any;
+    objects: Record<string, StoredObject>;
+    units: Record<string, string | undefined>;
+}
+
+interface DistributionRxData extends VisRxData {
+    noCard: boolean;
+    widgetTitle: string;
+    defaultColor: string;
+    defaultCircleSize: number | string;
+    defaultDistanceSize: number | string;
+    defaultFontSize: number | string;
+    defaultRadiusSize: number | string;
+    nodesCount: number;
+
+    'home-oid': string;
+    homeName: string;
+    homeColor: string;
+    homeTextColor: string;
+    homeStandardIcon: string;
+    homeIcon: string;
+    homeCircleSize: number | string;
+    homeDistanceSize: number | string;
+    homeFontSize: number | string;
+    homeIconSize: number | string;
+    homeUnit: string;
+    homeFactor: number | string;
+    homeRound: number | string;
+
+    'powerLine-oid': string;
+    'powerLineReturn-oid': string;
+    powerLineName: string;
+    powerLineColor: string;
+    powerLineTextColor: string;
+    powerLineReturnColor: string;
+    powerLineStandardIcon: string;
+    powerLineIcon: string;
+    powerLineCircleSize: number | string;
+    powerLineDistanceSize: number | string;
+    powerLineFontSize: number | string;
+    powerIconSize: number | string;
+    powerUnit: string;
+    powerFactor: number | string;
+    powerRound: number | string;
+    powerSpeed: number | string;
+    powerHideIfLess: number | string;
+    powerInvert: boolean | 'true' | 'false';
+
+    [key: `oid${number}`]: string;
+    [key: `name${number}`]: string;
+    [key: `color${number}`]: string;
+    [key: `textColor${number}`]: string;
+    [key: `returnColor${number}`]: string;
+    [key: `standardIcon${number}`]: string;
+    [key: `icon${number}`]: string;
+    [key: `circleSize${number}`]: number | string;
+    [key: `distanceSize${number}`]: number | string;
+    [key: `fontSize${number}`]: number | string;
+    [key: `iconSize${number}`]: number | string;
+    [key: `unit${number}`]: string;
+    [key: `factor${number}`]: number | string;
+    [key: `round${number}`]: number | string;
+    [key: `speed${number}`]: number | string;
+    [key: `hideIfLess${number}`]: number | string;
+    [key: `invert${number}`]: boolean | 'true' | 'false';
+    [key: `value2Oid${number}`]: string;
+    [key: `value2Unit${number}`]: string;
 }
 
 const styles: Record<string, React.CSSProperties> = {
@@ -44,7 +147,7 @@ function polarToCartesian(
     };
 }
 
-class Distribution extends Generic<Record<string, any>, DistributionState> {
+class Distribution extends Generic<DistributionRxData, DistributionState> {
     private readonly refCardContent: React.RefObject<HTMLDivElement> = React.createRef();
 
     private lastRxData?: string;
@@ -61,7 +164,7 @@ class Distribution extends Generic<Record<string, any>, DistributionState> {
             id: 'tplEnergy2Distribution',
             visSet: 'vis-2-widgets-energy',
             visSetLabel: 'set_label', // Label of widget set
-            visWidgetLabel: 'distribution',  // Label of widget
+            visWidgetLabel: 'distribution', // Label of widget
             visName: 'Distribution',
             visAttrs: [
                 {
@@ -102,6 +205,13 @@ class Distribution extends Generic<Record<string, any>, DistributionState> {
                             label: 'default_font_size',
                             tooltip: 'default_font_size_tooltip',
                             default: 12,
+                        },
+                        {
+                            name: 'defaultRadiusSize',
+                            type: 'number',
+                            label: 'default_radius_size',
+                            tooltip: 'default_radius_size_tooltip',
+                            default: 10,
                         },
                         {
                             name: 'nodesCount',
@@ -148,13 +258,14 @@ class Distribution extends Generic<Record<string, any>, DistributionState> {
                             name: 'homeStandardIcon',
                             type: 'icon64',
                             label: 'standard_icon',
-                            hidden: (data: any) => !!data.homeIcon,
-                            default: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBmaWxsPSJjdXJyZW50Q29sb3IiIGQ9Ik0xOSA5LjNWNGgtM3YyLjZMMTIgM0wyIDEyaDN2OGg1di02aDR2Nmg1di04aDNsLTMtMi43em0tOSAuN2MwLTEuMS45LTIgMi0yczIgLjkgMiAyaC00eiIvPjwvc3ZnPg==',
+                            hidden: (data: WidgetData) => !!data.homeIcon,
+                            default:
+                                'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBmaWxsPSJjdXJyZW50Q29sb3IiIGQ9Ik0xOSA5LjNWNGgtM3YyLjZMMTIgM0wyIDEyaDN2OGg1di02aDR2Nmg1di04aDNsLTMtMi43em0tOSAuN2MwLTEuMS45LTIgMi0yczIgLjkgMiAyaC00eiIvPjwvc3ZnPg==',
                         },
                         {
                             name: 'homeIcon',
                             type: 'image',
-                            hidden: (data: any) => !!data.homeStandardIcon,
+                            hidden: (data: WidgetData) => !!data.homeStandardIcon,
                             label: 'custom_icon',
                         },
                         {
@@ -186,7 +297,7 @@ class Distribution extends Generic<Record<string, any>, DistributionState> {
                             tooltip: 'icon_size_tooltip',
                             min: 0,
                             max: 230,
-                            hidden: (data: any) => !data.homeIcon && !data.homeStandardIcon,
+                            hidden: (data: WidgetData) => !data.homeIcon && !data.homeStandardIcon,
                         },
                         {
                             name: 'homeUnit',
@@ -206,7 +317,7 @@ class Distribution extends Generic<Record<string, any>, DistributionState> {
                                 { value: 0.001, label: '0.001' },
                             ],
                             label: 'factor',
-                            default: 1 as any,
+                            default: '1',
                             tooltip: 'factor_tooltip',
                         },
                         {
@@ -230,7 +341,8 @@ class Distribution extends Generic<Record<string, any>, DistributionState> {
                             onChange: async (field, data, changeData, socket) => {
                                 const object = await socket.getObject(data[field.name!]);
                                 if (object && object.common) {
-                                    data.powerLineColor = object.common.color !== undefined ? object.common.color : null;
+                                    data.powerLineColor =
+                                        object.common.color !== undefined ? object.common.color : null;
                                     data.powerLineName = Generic.getText(object.common.name);
                                     changeData(data);
                                 }
@@ -244,7 +356,8 @@ class Distribution extends Generic<Record<string, any>, DistributionState> {
                             onChange: async (field, data, changeData, socket) => {
                                 const object = await socket.getObject(data[field.name!]);
                                 if (object && object.common) {
-                                    data.powerLineColor = object.common.color !== undefined ? object.common.color : null;
+                                    data.powerLineColor =
+                                        object.common.color !== undefined ? object.common.color : null;
                                     data.powerLineName = Generic.getText(object.common.name);
                                     changeData(data);
                                 }
@@ -266,7 +379,7 @@ class Distribution extends Generic<Record<string, any>, DistributionState> {
                         },
                         {
                             name: 'powerLineReturnColor',
-                            hidden: (data: any) => !data['powerLineReturn-oid'],
+                            hidden: (data: WidgetData) => !data['powerLineReturn-oid'],
                             type: 'color',
                             label: 'power_line_return_color',
                             default: '#208020',
@@ -275,12 +388,13 @@ class Distribution extends Generic<Record<string, any>, DistributionState> {
                             name: 'powerLineStandardIcon',
                             type: 'icon64',
                             label: 'standard_icon',
-                            default: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0NzAgNDcwIiB3aWR0aD0iNDcwIiBoZWlnaHQ9IjQ3MCI+DQogICAgPHBhdGgNCiAgICAgICAgZmlsbD0iY3VycmVudENvbG9yIg0KICAgICAgICBkPSJNNDIwLjYzNCwxNjkuNDIyYy0wLjAwMi0wLjAyNS0wLjAwMy0wLjA1LTAuMDA2LTAuMDc0Yy0wLjA3Ni0wLjcyNS0wLjI1NS0xLjQxNi0wLjUyMy0yLjA2NQ0KYy0wLjAxNS0wLjAzNy0wLjAyOS0wLjA3My0wLjA0NS0wLjEwOWMtMC4yNjktMC42MjMtMC42MTctMS4xOTgtMS4wMzctMS43MmMtMC4wNDctMC4wNTktMC4wOTUtMC4xMTctMC4xNDQtMC4xNzQNCmMtMC4yNTItMC4yOTUtMC41MjUtMC41Ny0wLjgyLTAuODIzYy0wLjA0NC0wLjAzOC0wLjA4NC0wLjA3OS0wLjEyOS0wLjExNmMtMC4xNDItMC4xMTYtMC4yOS0wLjIyMy0wLjQ0LTAuMzI5DQpjLTAuMTE2LTAuMDgyLTAuMjM0LTAuMTU4LTAuMzU1LTAuMjMzYy0wLjE4MS0wLjExMy0wLjM2NC0wLjIxOS0wLjU1NS0wLjMxNmMtMC4xOTgtMC4xMDItMC40LTAuMTk2LTAuNjA3LTAuMjc5DQpjLTAuMDYxLTAuMDI0LTAuMTE3LTAuMDU5LTAuMTc4LTAuMDgybC0xMjEuMTU0LTUyLjExNVY2OS4yMTFoMTExLjAyOHYzMS40OWMwLDQuMTQyLDMuMzU4LDcuNSw3LjUsNy41czcuNS0zLjM1OCw3LjUtNy41VjYyLjEwOA0KYzAuMDA3LTAuMTMyLDAuMDItMC4yNjMsMC4wMi0wLjM5N2MwLTAuMjQzLTAuMDMzLTAuNDc2LTAuMDU2LTAuNzEzYy0wLjAwMi0wLjAyNS0wLjAwMy0wLjA1LTAuMDA2LTAuMDc0DQpjLTAuMDc2LTAuNzI1LTAuMjU1LTEuNDE2LTAuNTIzLTIuMDY1Yy0wLjAxNS0wLjAzNy0wLjAyOS0wLjA3My0wLjA0NS0wLjEwOWMtMC4yNjktMC42MjMtMC42MTctMS4xOTgtMS4wMzctMS43Mg0KYy0wLjA0Ny0wLjA1OS0wLjA5NS0wLjExNy0wLjE0NC0wLjE3NGMtMC4yNTItMC4yOTUtMC41MjUtMC41Ny0wLjgyLTAuODIzYy0wLjA0NC0wLjAzOC0wLjA4NC0wLjA3OS0wLjEyOS0wLjExNg0KYy0wLjE0Mi0wLjExNi0wLjI5LTAuMjIzLTAuNDQtMC4zMjljLTAuMTE2LTAuMDgyLTAuMjM0LTAuMTU4LTAuMzU1LTAuMjMzYy0wLjE4MS0wLjExMy0wLjM2NC0wLjIxOS0wLjU1NS0wLjMxNg0KYy0wLjE5OC0wLjEwMi0wLjQtMC4xOTYtMC42MDctMC4yNzljLTAuMDYxLTAuMDI0LTAuMTE3LTAuMDU5LTAuMTc4LTAuMDgyTDI5MC4xMDcsMC42MUMyODkuMTk1LDAuMjE5LDI4OC4xOTUsMCwyODcuMTQzLDBIMTgyLjgzNw0KYy0xLjA1MiwwLTIuMDUyLDAuMjE5LTIuOTYxLDAuNjA5QzE3OS44NzMsMC42MSw1My45Miw1NC43OSw1My45Miw1NC43OWMtMC4wMjMsMC4wMS0wLjA0NiwwLjAyLTAuMDY5LDAuMDMNCmMtMC4wODMsMC4wMzYtMC4xNTYsMC4wNzYtMC4yMzIsMC4xMTJjLTAuMTk4LDAuMDk0LTAuMzkxLDAuMTk0LTAuNTgsMC4zMDRjLTAuMTMxLDAuMDc2LTAuMjYyLDAuMTUyLTAuMzg3LDAuMjM1DQpjLTAuMDY1LDAuMDQzLTAuMTI1LDAuMDkxLTAuMTg5LDAuMTM2Yy0wLjEyNywwLjA5LTAuMjUyLDAuMTgxLTAuMzcyLDAuMjc4Yy0wLjA2LDAuMDQ5LTAuMTE4LDAuMTAxLTAuMTc3LDAuMTUyDQpjLTAuMTE2LDAuMS0wLjIyOSwwLjIwMS0wLjMzOCwwLjMwOGMtMC4wNTksMC4wNTctMC4xMTUsMC4xMTYtMC4xNzEsMC4xNzVjLTAuMTAxLDAuMTA1LTAuMTk5LDAuMjEyLTAuMjkzLDAuMzIzDQpjLTAuMDU4LDAuMDY3LTAuMTE0LDAuMTM2LTAuMTY5LDAuMjA1Yy0wLjA4NSwwLjEwNy0wLjE2NiwwLjIxNi0wLjI0NSwwLjMyN2MtMC4wNTYsMC4wNzgtMC4xMTEsMC4xNTYtMC4xNjQsMC4yMzYNCmMtMC4wNywwLjEwOC0wLjEzNSwwLjIxOS0wLjIsMC4zMjljLTAuMDUxLDAuMDg4LTAuMTA0LDAuMTc0LTAuMTUyLDAuMjY0Yy0wLjA2MSwwLjExNi0wLjExNSwwLjIzNS0wLjE3MSwwLjM1NA0KYy0wLjA2MSwwLjEzMi0wLjEyLDAuMjY1LTAuMTc0LDAuNGMtMC4wNjIsMC4xNTYtMC4xMjIsMC4zMTItMC4xNzMsMC40NzJjLTAuMDI5LDAuMDkxLTAuMDUyLDAuMTg1LTAuMDc3LDAuMjc4DQpjLTAuMDM3LDAuMTMyLTAuMDczLDAuMjY1LTAuMTAzLDAuMzk5Yy0wLjAyLDAuMDkxLTAuMDM1LDAuMTgzLTAuMDUyLDAuMjc1Yy0wLjAyNiwwLjE0NS0wLjA0OSwwLjI5LTAuMDY3LDAuNDM3DQpjLTAuMDEsMC4wODUtMC4wMTksMC4xNy0wLjAyNiwwLjI1NmMtMC4wMTQsMC4xNjItMC4wMjEsMC4zMjQtMC4wMjUsMC40ODdjLTAuMDAxLDAuMDUxLTAuMDA4LDAuMS0wLjAwOCwwLjE1djM4Ljk5DQpjMCw0LjE0MiwzLjM1OCw3LjUsNy41LDcuNXM3LjUtMy4zNTgsNy41LTcuNXYtMzEuNDloMTExLjAyOHY0MS43NzNMNTMuOTIsMTYzLjIxMmMtMC4wMjMsMC4wMS0wLjA0NiwwLjAyLTAuMDY5LDAuMDMNCmMtMC4wODMsMC4wMzYtMC4xNTYsMC4wNzYtMC4yMzIsMC4xMTJjLTAuMTk4LDAuMDk0LTAuMzkxLDAuMTk0LTAuNTgsMC4zMDRjLTAuMTMxLDAuMDc2LTAuMjYyLDAuMTUyLTAuMzg3LDAuMjM1DQpjLTAuMDY1LDAuMDQzLTAuMTI1LDAuMDkxLTAuMTg5LDAuMTM2Yy0wLjEyNywwLjA5LTAuMjUyLDAuMTgxLTAuMzcyLDAuMjc4Yy0wLjA2LDAuMDQ5LTAuMTE4LDAuMTAxLTAuMTc3LDAuMTUyDQpjLTAuMTE2LDAuMS0wLjIyOSwwLjIwMS0wLjMzOCwwLjMwOGMtMC4wNTksMC4wNTctMC4xMTUsMC4xMTYtMC4xNzEsMC4xNzVjLTAuMTAxLDAuMTA1LTAuMTk5LDAuMjEyLTAuMjkzLDAuMzIzDQpjLTAuMDU4LDAuMDY3LTAuMTE0LDAuMTM2LTAuMTY5LDAuMjA1Yy0wLjA4NSwwLjEwNy0wLjE2NiwwLjIxNi0wLjI0NSwwLjMyN2MtMC4wNTYsMC4wNzgtMC4xMTEsMC4xNTYtMC4xNjQsMC4yMzYNCmMtMC4wNywwLjEwOC0wLjEzNSwwLjIxOS0wLjIsMC4zMjljLTAuMDUxLDAuMDg4LTAuMTA0LDAuMTc0LTAuMTUyLDAuMjY0Yy0wLjA2MSwwLjExNi0wLjExNSwwLjIzNS0wLjE3MSwwLjM1NA0KYy0wLjA2MSwwLjEzMi0wLjEyLDAuMjY1LTAuMTc0LDAuNGMtMC4wNjIsMC4xNTYtMC4xMjIsMC4zMTItMC4xNzMsMC40NzJjLTAuMDI5LDAuMDkxLTAuMDUyLDAuMTg1LTAuMDc3LDAuMjc4DQpjLTAuMDM3LDAuMTMyLTAuMDczLDAuMjY1LTAuMTAzLDAuMzk5Yy0wLjAyLDAuMDkxLTAuMDM1LDAuMTgzLTAuMDUyLDAuMjc1Yy0wLjAyNiwwLjE0NS0wLjA0OSwwLjI5LTAuMDY3LDAuNDM3DQpjLTAuMDEsMC4wODUtMC4wMTksMC4xNy0wLjAyNiwwLjI1NmMtMC4wMTQsMC4xNjItMC4wMjEsMC4zMjQtMC4wMjUsMC40ODdjLTAuMDAxLDAuMDUxLTAuMDA4LDAuMS0wLjAwOCwwLjE1djM4Ljk5DQpjMCw0LjE0MiwzLjM1OCw3LjUsNy41LDcuNXM3LjUtMy4zNTgsNy41LTcuNXYtMzEuNDloMTA4LjMxN0w4NC4wMjMsNDYwLjI1NmMtMC4wMDgsMC4wMjYtMC4wMSwwLjA1My0wLjAxOCwwLjA3OQ0KYy0wLjEwNywwLjM1Ny0wLjE5LDAuNzIxLTAuMjQzLDEuMDg4Yy0wLjAwNCwwLjAyOC0wLjAxMSwwLjA1NS0wLjAxNSwwLjA4M2MtMC4wNDgsMC4zNTktMC4wNjIsMC43MjEtMC4wNTgsMS4wODMNCmMwLjAwMSwwLjA3MiwwLDAuMTQzLDAuMDAzLDAuMjE1YzAuMDE0LDAuMzUxLDAuMDUzLDAuNywwLjExNiwxLjA0N2MwLjAxMSwwLjA2LDAuMDI1LDAuMTE4LDAuMDM3LDAuMTc4DQpjMC4xNDgsMC43MTUsMC40MDMsMS40MTIsMC43NjMsMi4wN2MwLjAyOCwwLjA1MSwwLjA1NCwwLjEwMSwwLjA4MywwLjE1MWMwLjE3OCwwLjMwNywwLjM3OCwwLjYwNCwwLjYwMywwLjg5DQpjMC4wNDIsMC4wNTMsMC4wODgsMC4xMDMsMC4xMzEsMC4xNTVjMC4wOTIsMC4xMTEsMC4xOCwwLjIyNCwwLjI3OSwwLjMzYzAuMTI2LDAuMTM1LDAuMjYyLDAuMjU3LDAuMzk2LDAuMzgNCmMwLjA0MSwwLjAzOCwwLjA3OCwwLjA3OCwwLjEyLDAuMTE1YzAuMjg1LDAuMjUyLDAuNTg3LDAuNDc1LDAuODk5LDAuNjc2YzAuMDI1LDAuMDE2LDAuMDQ1LDAuMDM3LDAuMDcsMC4wNTMNCmMwLjAzNCwwLjAyMSwwLjA3LDAuMDM1LDAuMTA0LDAuMDU1YzAuMjQ4LDAuMTUsMC41MDEsMC4yODcsMC43NjEsMC40MDZjMC4wMzgsMC4wMTgsMC4wNzUsMC4wMzksMC4xMTQsMC4wNTYNCmMwLjI5NCwwLjEyOCwwLjU5MywwLjIzNiwwLjg5OCwwLjMyNmMwLjA2OSwwLjAyLDAuMTM5LDAuMDM1LDAuMjA5LDAuMDUzYzAuMjM3LDAuMDYyLDAuNDc3LDAuMTEzLDAuNzE4LDAuMTUxDQpjMC4wODgsMC4wMTQsMC4xNzYsMC4wMjksMC4yNjQsMC4wNGMwLjMwMiwwLjAzNywwLjYwNiwwLjA2MywwLjkxMSwwLjA2M2MxLjYyMSwwLDMuMjMzLTAuNTE0LDQuNTgxLTEuNTUyDQpjMC4xOTEtMC4xNDcsMC4zNzYtMC4zMDQsMC41NTUtMC40NzFsMjEzLjY2My0xOTkuOTYzbDUzLjE1MSwxNjkuNTM5bC0xMDEuMDU2LTk0LjU3NmMtMy4wMjUtMi44My03Ljc3MS0yLjY3My0xMC42MDEsMC4zNTENCnMtMi42NzMsNy43NzEsMC4zNTEsMTAuNjAxbDEyMS44NjIsMTE0LjA0N2MxLjQyOCwxLjMzNiwzLjI3MSwyLjAyNCw1LjEyNywyLjAyNGMxLjM3NywwLDIuNzYxLTAuMzc4LDMuOTg5LTEuMTUNCmMyLjg4NC0xLjgxMyw0LjE4NS01LjM0MiwzLjE2Ni04LjU5M2wtODguNjAyLTI4Mi42MjJoMTA4LjMxN3YzMS40OWMwLDQuMTQyLDMuMzU4LDcuNSw3LjUsNy41czcuNS0zLjM1OCw3LjUtNy41di0zOC41OTQNCmMwLjAwNy0wLjEzMiwwLjAyLTAuMjYzLDAuMDItMC4zOTdDNDIwLjY5MSwxNjkuODkyLDQyMC42NTgsMTY5LjY1OCw0MjAuNjM1LDE2OS40MjF6IE0xOTAuMzM3LDE2Mi42MzR2LTM5LjIxMWg4OS4zMDd2MzkuMjExDQpIMTkwLjMzN3ogTTI5NC42NDMsNTQuMjExVjE4Ljg5MWw4Mi4xMTIsMzUuMzIxSDI5NC42NDN6IE0xOTAuMzM3LDE1aDg5LjMwN3YzOS4yMTFoLTg5LjMwN1YxNXogTTkzLjIyNSw1NC4yMTFsODIuMTEyLTM1LjMyMQ0KdjM1LjMyMUg5My4yMjV6IE0yNzkuNjQzLDY5LjIxMXYzOS4yMTFoLTg5LjMwN1Y2OS4yMTFIMjc5LjY0M3ogTTE3NS4zMzcsMTI3LjMxM3YzNS4zMjFIOTMuMjI1TDE3NS4zMzcsMTI3LjMxM3ogTTE2MC4wMTIsMjY4LjAxMw0KbDY0LjAwMiw1OS44OThsLTExNy4xNTIsMTA5LjY0TDE2MC4wMTIsMjY4LjAxM3ogTTMwNC45ODksMjUyLjEyOWwtNjkuOTk5LDY1LjUxbC02OS45OTgtNjUuNTFsMjMuMzU0LTc0LjQ5NWg5My4yODkNCkwzMDQuOTg5LDI1Mi4xMjl6IE0yOTQuNjQzLDE2Mi42MzR2LTM1LjMyMWw4Mi4xMTIsMzUuMzIySDI5NC42NDR6Ig0KICAgIC8+DQo8L3N2Zz4=',
-                            hidden: (data: any) => !!data.powerLineIcon,
+                            default:
+                                'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0NzAgNDcwIiB3aWR0aD0iNDcwIiBoZWlnaHQ9IjQ3MCI+DQogICAgPHBhdGgNCiAgICAgICAgZmlsbD0iY3VycmVudENvbG9yIg0KICAgICAgICBkPSJNNDIwLjYzNCwxNjkuNDIyYy0wLjAwMi0wLjAyNS0wLjAwMy0wLjA1LTAuMDA2LTAuMDc0Yy0wLjA3Ni0wLjcyNS0wLjI1NS0xLjQxNi0wLjUyMy0yLjA2NQ0KYy0wLjAxNS0wLjAzNy0wLjAyOS0wLjA3My0wLjA0NS0wLjEwOWMtMC4yNjktMC42MjMtMC42MTctMS4xOTgtMS4wMzctMS43MmMtMC4wNDctMC4wNTktMC4wOTUtMC4xMTctMC4xNDQtMC4xNzQNCmMtMC4yNTItMC4yOTUtMC41MjUtMC41Ny0wLjgyLTAuODIzYy0wLjA0NC0wLjAzOC0wLjA4NC0wLjA3OS0wLjEyOS0wLjExNmMtMC4xNDItMC4xMTYtMC4yOS0wLjIyMy0wLjQ0LTAuMzI5DQpjLTAuMTE2LTAuMDgyLTAuMjM0LTAuMTU4LTAuMzU1LTAuMjMzYy0wLjE4MS0wLjExMy0wLjM2NC0wLjIxOS0wLjU1NS0wLjMxNmMtMC4xOTgtMC4xMDItMC40LTAuMTk2LTAuNjA3LTAuMjc5DQpjLTAuMDYxLTAuMDI0LTAuMTE3LTAuMDU5LTAuMTc4LTAuMDgybC0xMjEuMTU0LTUyLjExNVY2OS4yMTFoMTExLjAyOHYzMS40OWMwLDQuMTQyLDMuMzU4LDcuNSw3LjUsNy41czcuNS0zLjM1OCw3LjUtNy41VjYyLjEwOA0KYzAuMDA3LTAuMTMyLDAuMDItMC4yNjMsMC4wMi0wLjM5N2MwLTAuMjQzLTAuMDMzLTAuNDc2LTAuMDU2LTAuNzEzYy0wLjAwMi0wLjAyNS0wLjAwMy0wLjA1LTAuMDA2LTAuMDc0DQpjLTAuMDc2LTAuNzI1LTAuMjU1LTEuNDE2LTAuNTIzLTIuMDY1Yy0wLjAxNS0wLjAzNy0wLjAyOS0wLjA3My0wLjA0NS0wLjEwOWMtMC4yNjktMC42MjMtMC42MTctMS4xOTgtMS4wMzctMS43Mg0KYy0wLjA0Ny0wLjA1OS0wLjA5NS0wLjExNy0wLjE0NC0wLjE3NGMtMC4yNTItMC4yOTUtMC41MjUtMC41Ny0wLjgyLTAuODIzYy0wLjA0NC0wLjAzOC0wLjA4NC0wLjA3OS0wLjEyOS0wLjExNg0KYy0wLjE0Mi0wLjExNi0wLjI5LTAuMjIzLTAuNDQtMC4zMjljLTAuMTE2LTAuMDgyLTAuMjM0LTAuMTU4LTAuMzU1LTAuMjMzYy0wLjE4MS0wLjExMy0wLjM2NC0wLjIxOS0wLjU1NS0wLjMxNg0KYy0wLjE5OC0wLjEwMi0wLjQtMC4xOTYtMC42MDctMC4yNzljLTAuMDYxLTAuMDI0LTAuMTE3LTAuMDU5LTAuMTc4LTAuMDgyTDI5MC4xMDcsMC42MUMyODkuMTk1LDAuMjE5LDI4OC4xOTUsMCwyODcuMTQzLDBIMTgyLjgzNw0KYy0xLjA1MiwwLTIuMDUyLDAuMjE5LTIuOTYxLDAuNjA5QzE3OS44NzMsMC42MSw1My45Miw1NC43OSw1My45Miw1NC43OWMtMC4wMjMsMC4wMS0wLjA0NiwwLjAyLTAuMDY5LDAuMDMNCmMtMC4wODMsMC4wMzYtMC4xNTYsMC4wNzYtMC4yMzIsMC4xMTJjLTAuMTk4LDAuMDk0LTAuMzkxLDAuMTk0LTAuNTgsMC4zMDRjLTAuMTMxLDAuMDc2LTAuMjYyLDAuMTUyLTAuMzg3LDAuMjM1DQpjLTAuMDY1LDAuMDQzLTAuMTI1LDAuMDkxLTAuMTg5LDAuMTM2Yy0wLjEyNywwLjA5LTAuMjUyLDAuMTgxLTAuMzcyLDAuMjc4Yy0wLjA2LDAuMDQ5LTAuMTE4LDAuMTAxLTAuMTc3LDAuMTUyDQpjLTAuMTE2LDAuMS0wLjIyOSwwLjIwMS0wLjMzOCwwLjMwOGMtMC4wNTksMC4wNTctMC4xMTUsMC4xMTYtMC4xNzEsMC4xNzVjLTAuMTAxLDAuMTA1LTAuMTk5LDAuMjEyLTAuMjkzLDAuMzIzDQpjLTAuMDU4LDAuMDY3LTAuMTE0LDAuMTM2LTAuMTY5LDAuMjA1Yy0wLjA4NSwwLjEwNy0wLjE2NiwwLjIxNi0wLjI0NSwwLjMyN2MtMC4wNTYsMC4wNzgtMC4xMTEsMC4xNTYtMC4xNjQsMC4yMzYNCmMtMC4wNywwLjEwOC0wLjEzNSwwLjIxOS0wLjIsMC4zMjljLTAuMDUxLDAuMDg4LTAuMTA0LDAuMTc0LTAuMTUyLDAuMjY0Yy0wLjA2MSwwLjExNi0wLjExNSwwLjIzNS0wLjE3MSwwLjM1NA0KYy0wLjA2MSwwLjEzMi0wLjEyLDAuMjY1LTAuMTc0LDAuNGMtMC4wNjIsMC4xNTYtMC4xMjIsMC4zMTItMC4xNzMsMC40NzJjLTAuMDI5LDAuMDkxLTAuMDUyLDAuMTg1LTAuMDc3LDAuMjc4DQpjLTAuMDM3LDAuMTMyLTAuMDczLDAuMjY1LTAuMTAzLDAuMzk5Yy0wLjAyLDAuMDkxLTAuMDM1LDAuMTgzLTAuMDUyLDAuMjc1Yy0wLjAyNiwwLjE0NS0wLjA0OSwwLjI5LTAuMDY3LDAuNDM3DQpjLTAuMDEsMC4wODUtMC4wMTksMC4xNy0wLjAyNiwwLjI1NmMtMC4wMTQsMC4xNjItMC4wMjEsMC4zMjQtMC4wMjUsMC40ODdjLTAuMDAxLDAuMDUxLTAuMDA4LDAuMS0wLjAwOCwwLjE1djM4Ljk5DQpjMCw0LjE0MiwzLjM1OCw3LjUsNy41LDcuNXM3LjUtMy4zNTgsNy41LTcuNXYtMzEuNDloMTExLjAyOHY0MS43NzNMNTMuOTIsMTYzLjIxMmMtMC4wMjMsMC4wMS0wLjA0NiwwLjAyLTAuMDY5LDAuMDMNCmMtMC4wODMsMC4wMzYtMC4xNTYsMC4wNzYtMC4yMzIsMC4xMTJjLTAuMTk4LDAuMDk0LTAuMzkxLDAuMTk0LTAuNTgsMC4zMDRjLTAuMTMxLDAuMDc2LTAuMjYyLDAuMTUyLTAuMzg3LDAuMjM1DQpjLTAuMDY1LDAuMDQzLTAuMTI1LDAuMDkxLTAuMTg5LDAuMTM2Yy0wLjEyNywwLjA5LTAuMjUyLDAuMTgxLTAuMzcyLDAuMjc4Yy0wLjA2LDAuMDQ5LTAuMTE4LDAuMTAxLTAuMTc3LDAuMTUyDQpjLTAuMTE2LDAuMS0wLjIyOSwwLjIwMS0wLjMzOCwwLjMwOGMtMC4wNTksMC4wNTctMC4xMTUsMC4xMTYtMC4xNzEsMC4xNzVjLTAuMTAxLDAuMTA1LTAuMTk5LDAuMjEyLTAuMjkzLDAuMzIzDQpjLTAuMDU4LDAuMDY3LTAuMTE0LDAuMTM2LTAuMTY5LDAuMjA1Yy0wLjA4NSwwLjEwNy0wLjE2NiwwLjIxNi0wLjI0NSwwLjMyN2MtMC4wNTYsMC4wNzgtMC4xMTEsMC4xNTYtMC4xNjQsMC4yMzYNCmMtMC4wNywwLjEwOC0wLjEzNSwwLjIxOS0wLjIsMC4zMjljLTAuMDUxLDAuMDg4LTAuMTA0LDAuMTc0LTAuMTUyLDAuMjY0Yy0wLjA2MSwwLjExNi0wLjExNSwwLjIzNS0wLjE3MSwwLjM1NA0KYy0wLjA2MSwwLjEzMi0wLjEyLDAuMjY1LTAuMTc0LDAuNGMtMC4wNjIsMC4xNTYtMC4xMjIsMC4zMTItMC4xNzMsMC40NzJjLTAuMDI5LDAuMDkxLTAuMDUyLDAuMTg1LTAuMDc3LDAuMjc4DQpjLTAuMDM3LDAuMTMyLTAuMDczLDAuMjY1LTAuMTAzLDAuMzk5Yy0wLjAyLDAuMDkxLTAuMDM1LDAuMTgzLTAuMDUyLDAuMjc1Yy0wLjAyNiwwLjE0NS0wLjA0OSwwLjI5LTAuMDY3LDAuNDM3DQpjLTAuMDEsMC4wODUtMC4wMTksMC4xNy0wLjAyNiwwLjI1NmMtMC4wMTQsMC4xNjItMC4wMjEsMC4zMjQtMC4wMjUsMC40ODdjLTAuMDAxLDAuMDUxLTAuMDA4LDAuMS0wLjAwOCwwLjE1djM4Ljk5DQpjMCw0LjE0MiwzLjM1OCw3LjUsNy41LDcuNXM3LjUtMy4zNTgsNy41LTcuNXYtMzEuNDloMTA4LjMxN0w4NC4wMjMsNDYwLjI1NmMtMC4wMDgsMC4wMjYtMC4wMSwwLjA1My0wLjAxOCwwLjA3OQ0KYy0wLjEwNywwLjM1Ny0wLjE5LDAuNzIxLTAuMjQzLDEuMDg4Yy0wLjAwNCwwLjAyOC0wLjAxMSwwLjA1NS0wLjAxNSwwLjA4M2MtMC4wNDgsMC4zNTktMC4wNjIsMC43MjEtMC4wNTgsMS4wODMNCmMwLjAwMSwwLjA3MiwwLDAuMTQzLDAuMDAzLDAuMjE1YzAuMDE0LDAuMzUxLDAuMDUzLDAuNywwLjExNiwxLjA0N2MwLjAxMSwwLjA2LDAuMDI1LDAuMTE4LDAuMDM3LDAuMTc4DQpjMC4xNDgsMC43MTUsMC40MDMsMS40MTIsMC43NjMsMi4wN2MwLjAyOCwwLjA1MSwwLjA1NCwwLjEwMSwwLjA4MywwLjE1MWMwLjE3OCwwLjMwNywwLjM3OCwwLjYwNCwwLjYwMywwLjg5DQpjMC4wNDIsMC4wNTMsMC4wODgsMC4xMDMsMC4xMzEsMC4xNTVjMC4wOTIsMC4xMTEsMC4xOCwwLjIyNCwwLjI3OSwwLjMzYzAuMTI2LDAuMTM1LDAuMjYyLDAuMjU3LDAuMzk2LDAuMzgNCmMwLjA0MSwwLjAzOCwwLjA3OCwwLjA3OCwwLjEyLDAuMTE1YzAuMjg1LDAuMjUyLDAuNTg3LDAuNDc1LDAuODk5LDAuNjc2YzAuMDI1LDAuMDE2LDAuMDQ1LDAuMDM3LDAuMDcsMC4wNTMNCmMwLjAzNCwwLjAyMSwwLjA3LDAuMDM1LDAuMTA0LDAuMDU1YzAuMjQ4LDAuMTUsMC41MDEsMC4yODcsMC43NjEsMC40MDZjMC4wMzgsMC4wMTgsMC4wNzUsMC4wMzksMC4xMTQsMC4wNTYNCmMwLjI5NCwwLjEyOCwwLjU5MywwLjIzNiwwLjg5OCwwLjMyNmMwLjA2OSwwLjAyLDAuMTM5LDAuMDM1LDAuMjA5LDAuMDUzYzAuMjM3LDAuMDYyLDAuNDc3LDAuMTEzLDAuNzE4LDAuMTUxDQpjMC4wODgsMC4wMTQsMC4xNzYsMC4wMjksMC4yNjQsMC4wNGMwLjMwMiwwLjAzNywwLjYwNiwwLjA2MywwLjkxMSwwLjA2M2MxLjYyMSwwLDMuMjMzLTAuNTE0LDQuNTgxLTEuNTUyDQpjMC4xOTEtMC4xNDcsMC4zNzYtMC4zMDQsMC41NTUtMC40NzFsMjEzLjY2My0xOTkuOTYzbDUzLjE1MSwxNjkuNTM5bC0xMDEuMDU2LTk0LjU3NmMtMy4wMjUtMi44My03Ljc3MS0yLjY3My0xMC42MDEsMC4zNTENCnMtMi42NzMsNy43NzEsMC4zNTEsMTAuNjAxbDEyMS44NjIsMTE0LjA0N2MxLjQyOCwxLjMzNiwzLjI3MSwyLjAyNCw1LjEyNywyLjAyNGMxLjM3NywwLDIuNzYxLTAuMzc4LDMuOTg5LTEuMTUNCmMyLjg4NC0xLjgxMyw0LjE4NS01LjM0MiwzLjE2Ni04LjU5M2wtODguNjAyLTI4Mi42MjJoMTA4LjMxN3YzMS40OWMwLDQuMTQyLDMuMzU4LDcuNSw3LjUsNy41czcuNS0zLjM1OCw3LjUtNy41di0zOC41OTQNCmMwLjAwNy0wLjEzMiwwLjAyLTAuMjYzLDAuMDItMC4zOTdDNDIwLjY5MSwxNjkuODkyLDQyMC42NTgsMTY5LjY1OCw0MjAuNjM1LDE2OS40MjF6IE0xOTAuMzM3LDE2Mi42MzR2LTM5LjIxMWg4OS4zMDd2MzkuMjExDQpIMTkwLjMzN3ogTTI5NC42NDMsNTQuMjExVjE4Ljg5MWw4Mi4xMTIsMzUuMzIxSDI5NC42NDN6IE0xOTAuMzM3LDE1aDg5LjMwN3YzOS4yMTFoLTg5LjMwN1YxNXogTTkzLjIyNSw1NC4yMTFsODIuMTEyLTM1LjMyMQ0KdjM1LjMyMUg5My4yMjV6IE0yNzkuNjQzLDY5LjIxMXYzOS4yMTFoLTg5LjMwN1Y2OS4yMTFIMjc5LjY0M3ogTTE3NS4zMzcsMTI3LjMxM3YzNS4zMjFIOTMuMjI1TDE3NS4zMzcsMTI3LjMxM3ogTTE2MC4wMTIsMjY4LjAxMw0KbDY0LjAwMiw1OS44OThsLTExNy4xNTIsMTA5LjY0TDE2MC4wMTIsMjY4LjAxM3ogTTMwNC45ODksMjUyLjEyOWwtNjkuOTk5LDY1LjUxbC02OS45OTgtNjUuNTFsMjMuMzU0LTc0LjQ5NWg5My4yODkNCkwzMDQuOTg5LDI1Mi4xMjl6IE0yOTQuNjQzLDE2Mi42MzR2LTM1LjMyMWw4Mi4xMTIsMzUuMzIySDI5NC42NDR6Ig0KICAgIC8+DQo8L3N2Zz4=',
+                            hidden: (data: WidgetData) => !!data.powerLineIcon,
                         },
                         {
                             name: 'powerLineIcon',
-                            hidden: (data: any) => !!data.powerLineStandardIcon,
+                            hidden: (data: WidgetData) => !!data.powerLineStandardIcon,
                             type: 'image',
                             label: 'custom_icon',
                         },
@@ -311,7 +425,7 @@ class Distribution extends Generic<Record<string, any>, DistributionState> {
                             type: 'slider',
                             label: 'icon_size',
                             tooltip: 'icon_size_tooltip',
-                            hidden: (data: any) => !data.powerLineIcon && !data.powerLineStandardIcon,
+                            hidden: (data: WidgetData) => !data.powerLineIcon && !data.powerLineStandardIcon,
                             min: 0,
                             max: 230,
                         },
@@ -333,7 +447,7 @@ class Distribution extends Generic<Record<string, any>, DistributionState> {
                                 { value: 0.001, label: '0.001' },
                             ],
                             label: 'factor',
-                            default: 1 as any,
+                            default: '1',
                             tooltip: 'factor_tooltip',
                         },
                         {
@@ -377,7 +491,8 @@ class Distribution extends Generic<Record<string, any>, DistributionState> {
                             onChange: async (field, data, changeData, socket) => {
                                 const object = await socket.getObject(data[field.name!]);
                                 if (object && object.common) {
-                                    data[`color${field.index}`] = object.common.color !== undefined ? object.common.color : null;
+                                    data[`color${field.index}`] =
+                                        object.common.color !== undefined ? object.common.color : null;
                                     data[`name${field.index}`] = Generic.getText(object.common.name);
                                     changeData(data);
                                 }
@@ -460,7 +575,7 @@ class Distribution extends Generic<Record<string, any>, DistributionState> {
                                 { value: 0.001, label: '0.001' },
                             ],
                             label: 'factor',
-                            default: 1 as any,
+                            default: '1',
                             tooltip: 'factor_tooltip',
                         },
                         {
@@ -511,14 +626,14 @@ class Distribution extends Generic<Record<string, any>, DistributionState> {
         };
     }
 
-    async loadObject(oid: string, iconExists: boolean) {
+    async loadObject(oid: string, iconExists?: boolean): Promise<StoredObject> {
         if (oid) {
             // read object itself
             const object = await this.props.context.socket.getObject(oid);
             if (!object) {
-                return { common: {} } as any;
+                return { common: {} } as StoredObject;
             }
-            object.common = object.common || ({} as any);
+            object.common ||= {} as ioBroker.StateCommon;
             if (!iconExists && !object.common.icon && (object.type === 'state' || object.type === 'channel')) {
                 const idArray = oid.split('.');
 
@@ -533,9 +648,9 @@ class Distribution extends Generic<Record<string, any>, DistributionState> {
                     object.common.icon = parentObject.common.icon;
                 }
             }
-            return { common: object.common, _id: object._id };
+            return { common: object.common as ioBroker.StateCommon, _id: object._id };
         }
-        return { common: {} };
+        return { common: {} as ioBroker.StateCommon };
     }
 
     async propertiesUpdate() {
@@ -546,29 +661,29 @@ class Distribution extends Generic<Record<string, any>, DistributionState> {
 
         this.lastRxData = actualRxData;
 
-        const objects: Record<string, any> = {};
-        const units: Record<string, any> = {};
+        const objects: Record<string, StoredObject> = {};
+        const units: Record<string, string | undefined> = {};
 
         // try to find icons for all OIDs
         for (let i = 1; i <= this.state.rxData.nodesCount; i++) {
             const idx = `object${i}`;
-            objects[idx] = await this.loadObject(this.state.rxData[`oid${i}`], this.state.rxData[`icon${i}`]);
+            objects[idx] = await this.loadObject(this.state.rxData[`oid${i}`], !!this.state.rxData[`icon${i}`]);
             if (this.state.rxData[`unit${i}`]) {
                 objects[idx].common.unit = this.state.rxData[`unit${i}`];
             }
-            objects[idx].factor = parseFloat(this.state.rxData[`factor${i}`]) || 1;
+            objects[idx].factor = parseFloat(this.state.rxData[`factor${i}`] as string) || 1;
 
             let n = this.state.rxData[`round${i}`];
-            objects[idx].round = n === undefined || n === null || n === '' ? 2 : (parseFloat(n) || 0);
+            objects[idx].round = n === undefined || n === null || n === '' ? 2 : parseFloat(n as string) || 0;
 
             n = this.state.rxData[`speed${i}`];
-            objects[idx].speed = n === undefined || n === null || n === '' ? 50 : (parseFloat(n) || 50);
+            objects[idx].speed = n === undefined || n === null || n === '' ? 50 : parseFloat(n as string) || 50;
 
             n = this.state.rxData[`hideIfLess${i}`];
-            objects[idx].hideIfLess = n === undefined || n === null || n === '' ? null : (parseFloat(n) || 0);
+            objects[idx].hideIfLess = n === undefined || n === null || n === '' ? null : parseFloat(n as string) || 0;
 
-            n = this.state.rxData[`invert${i}`];
-            objects[idx].invert = n === true || n === 'true';
+            const invert = this.state.rxData[`invert${i}`];
+            objects[idx].invert = invert === true || invert === 'true';
 
             units[this.state.rxData[`oid${i}`]] = objects[idx].common.unit;
 
@@ -579,34 +694,37 @@ class Distribution extends Generic<Record<string, any>, DistributionState> {
             }
         }
         // home
-        objects.home = await this.loadObject(this.state.rxData['home-oid'], this.state.rxData.homeIcon);
+        objects.home = await this.loadObject(this.state.rxData['home-oid'], !!this.state.rxData.homeIcon);
         if (this.state.rxData.homeUnit) {
             objects.home.common.unit = this.state.rxData.homeUnit;
         }
-        objects.home.factor = parseFloat(this.state.rxData.homeFactor) || 1;
+        objects.home.factor = parseFloat(this.state.rxData.homeFactor as string) || 1;
         let n = this.state.rxData.homeRound;
-        objects.home.round = n === undefined || n === null || n === '' ? 2 : (parseFloat(n) || 0);
+        objects.home.round = n === undefined || n === null || n === '' ? 2 : parseFloat(n as string) || 0;
 
         objects.home.hideIfLess = null;
 
         // power line
-        objects.powerLine = await this.loadObject(this.state.rxData['powerLine-oid'], this.state.rxData.powerLineIcon);
+        objects.powerLine = await this.loadObject(
+            this.state.rxData['powerLine-oid'],
+            !!this.state.rxData.powerLineIcon,
+        );
         if (this.state.rxData.powerUnit) {
             objects.powerLine.common.unit = this.state.rxData.powerUnit;
         }
-        objects.powerLine.factor = parseFloat(this.state.rxData.powerFactor) || 1;
+        objects.powerLine.factor = parseFloat(this.state.rxData.powerFactor as string) || 1;
 
-        n = this.state.rxData.powerInvert;
-        objects.powerLine.invert = n === true || n === 'true';
+        const invert = this.state.rxData.powerInvert;
+        objects.powerLine.invert = invert === true || invert === 'true';
 
         n = this.state.rxData.powerRound;
-        objects.powerLine.round = n === undefined || n === null || n === '' ? 2 : (parseFloat(n) || 0);
+        objects.powerLine.round = n === undefined || n === null || n === '' ? 2 : parseFloat(n as string) || 0;
 
         n = this.state.rxData.powerSpeed;
-        objects.powerLine.speed = n === undefined || n === null || n === '' ? 50 : (parseFloat(n) || 50);
+        objects.powerLine.speed = n === undefined || n === null || n === '' ? 50 : parseFloat(n as string) || 50;
 
         n = this.state.rxData.powerHideIfLess;
-        objects.powerLine.hideIfLess = n === undefined || n === null || n === '' ? null : (parseFloat(n) || 0);
+        objects.powerLine.hideIfLess = n === undefined || n === null || n === '' ? null : parseFloat(n as string) || 0;
 
         units[this.state.rxData['home-oid']] = objects.home.common.unit;
         units[this.state.rxData['powerLine-oid']] = objects.powerLine.common.unit;
@@ -624,7 +742,7 @@ class Distribution extends Generic<Record<string, any>, DistributionState> {
         this.propertiesUpdate();
         this.offsetInterval = setInterval(() => {
             let offset = this.state.offset + 1;
-            if (offset > 0x0FFFFFFF) {
+            if (offset > 0x0fffffff) {
                 offset = 0;
             }
             this.setState({ offset });
@@ -640,7 +758,7 @@ class Distribution extends Generic<Record<string, any>, DistributionState> {
         this.propertiesUpdate();
     }
 
-    getValue(oid: any, obj: any) {
+    getValue(oid: string, obj: StoredObject): { unit?: string; value?: string; iValue: number } {
         let value;
         if (oid) {
             value = this.state.values[`${oid}.val`];
@@ -652,10 +770,11 @@ class Distribution extends Generic<Record<string, any>, DistributionState> {
                 if (this.state.units[oid] === 'Wh') {
                     value = Math.round(value / 10) / 100;
                 }
-                if (obj && obj.factor !== 1) {
+                if (obj?.factor && obj.factor !== 1) {
                     value *= obj.factor;
                 }
-                value = this.formatValue(value, obj?.round === undefined ? 2 : obj.round);
+                // @ts-expect-error types must be fixed in vis-2
+                value = this.formatValue(value, obj?.round ?? 2);
             }
             return {
                 unit: this.state.units[oid],
@@ -683,18 +802,22 @@ class Distribution extends Generic<Record<string, any>, DistributionState> {
             }
         }
 
-        const defaultRadiusSize = this.state.rxData.defaultRadiusSize || 10;
-        const defaultDistanceSize = this.state.rxData.defaultDistanceSize || 18;
-        const defaultFontSize = this.state.rxData.defaultFontSize || 12;
+        const defaultRadiusSize = parseFloat(this.state.rxData.defaultRadiusSize as string) || 10;
+        const defaultDistanceSize = parseFloat(this.state.rxData.defaultDistanceSize as string) || 18;
+        const defaultFontSize = parseFloat(this.state.rxData.defaultFontSize as string) || 12;
 
         size -= defaultFontSize * 2; // let place for upper and bottom labels
 
-        const homeRadius = (size * (this.state.rxData.homeCircleSize || defaultRadiusSize)) / 100;
-        const homeFontSize = defaultFontSize || this.state.rxData.homeFontSize;
-        let homeIcon = this.state.rxData.homeStandardIcon || this.state.rxData.homeIcon || this.state.objects.home?.common?.icon;
+        const homeRadius = (size * (parseFloat(this.state.rxData.homeCircleSize as string) || defaultRadiusSize)) / 100;
+        const homeFontSize = defaultFontSize || parseFloat(this.state.rxData.homeFontSize as string);
+        let homeIcon =
+            this.state.rxData.homeStandardIcon || this.state.rxData.homeIcon || this.state.objects.home?.common?.icon;
 
-        if (homeIcon && homeIcon.startsWith('_PRJ_NAME/')) {
-            homeIcon = homeIcon.replace('_PRJ_NAME/', `${this.props.context.adapterName}.${this.props.context.instance}/${this.props.context.projectName}${homeIcon.substring(9)}`);
+        if (homeIcon?.startsWith('_PRJ_NAME/')) {
+            homeIcon = homeIcon.replace(
+                '_PRJ_NAME/',
+                `${this.props.context.adapterName}.${this.props.context.instance}/${this.props.context.projectName}${homeIcon.substring(9)}`,
+            );
         }
 
         let maxRadius = 0;
@@ -703,28 +826,43 @@ class Distribution extends Generic<Record<string, any>, DistributionState> {
         const valueAndUnit = this.getValue(this.state.rxData['powerLine-oid'], this.state.objects.powerLine);
 
         // add power line
-        let circles: any[] = [{
-            name: this.state.rxData.powerLineName,
-            color: valueAndUnit.iValue < 0 ? (this.props.context.themeType === 'dark' ? '#43d243' : '#266e26') : this.state.rxData.powerLineColor,
-            radius: (size * (this.state.rxData.powerLineCircleSize || defaultRadiusSize)) / 100,
-            distance: (size * (this.state.rxData.powerLineDistanceSize || defaultDistanceSize)) / 100,
-            fontSize: defaultFontSize || this.state.rxData.powerLineFontSize,
-            oid: this.state.rxData['powerLine-oid'],
-            unit: valueAndUnit.unit || Generic.t('kwh'),
-            value: valueAndUnit.value,
-            iValue: valueAndUnit.iValue,
-            icon: this.state.rxData.powerLineStandardIcon || this.state.rxData.powerLineIcon || this.state.objects.powerLine?.common?.icon,
-            arrow: valueAndUnit.iValue >= 0 ? '→' : '←', // '↦',
-            secondaryValue: this.getValue(this.state.rxData['powerLineReturn-oid'], this.state.objects.powerLine),
-            secondaryArrow: '←',
-            iconSize: parseFloat(this.state.rxData.powerIconSize) || 33.3,
-            hide: this.state.objects.powerLine &&
-                this.state.objects.powerLine.hideIfLess !== null &&
-                valueAndUnit.iValue < this.state.objects.powerLine.hideIfLess,
-            invert: this.state.objects.powerLine?.invert || false,
-            speed: parseFloat(this.state.objects.powerLine?.speed) || 50,
-            textColor: this.state.rxData.powerLineTextColor,
-        }];
+        let circles: Circle[] = [
+            {
+                name: this.state.rxData.powerLineName,
+                color:
+                    valueAndUnit.iValue < 0
+                        ? this.props.context.themeType === 'dark'
+                            ? '#43d243'
+                            : '#266e26'
+                        : this.state.rxData.powerLineColor,
+                radius:
+                    (size * (parseFloat(this.state.rxData.powerLineCircleSize as string) || defaultRadiusSize)) / 100,
+                distance:
+                    (size * (parseFloat(this.state.rxData.powerLineDistanceSize as string) || defaultDistanceSize)) /
+                    100,
+                fontSize: defaultFontSize || parseFloat(this.state.rxData.powerLineFontSize as string),
+                oid: this.state.rxData['powerLine-oid'],
+                unit: valueAndUnit.unit || Generic.t('kwh'),
+                value: valueAndUnit.value,
+                iValue: valueAndUnit.iValue,
+                icon:
+                    this.state.rxData.powerLineStandardIcon ||
+                    this.state.rxData.powerLineIcon ||
+                    this.state.objects.powerLine?.common?.icon,
+                arrow: valueAndUnit.iValue >= 0 ? '→' : '←', // '↦',
+                secondaryValue: this.getValue(this.state.rxData['powerLineReturn-oid'], this.state.objects.powerLine),
+                secondaryArrow: '←',
+                iconSize: parseFloat(this.state.rxData.powerIconSize as string) || 33.3,
+                hide:
+                    this.state.objects.powerLine &&
+                    this.state.objects.powerLine.hideIfLess !== null &&
+                    this.state.objects.powerLine.hideIfLess !== undefined &&
+                    valueAndUnit.iValue < this.state.objects.powerLine.hideIfLess,
+                invert: this.state.objects.powerLine?.invert || false,
+                speed: parseFloat((this.state.objects.powerLine?.speed as string) || '50') || 50,
+                textColor: this.state.rxData.powerLineTextColor,
+            },
+        ];
 
         if (circles[0].radius > maxRadius) {
             maxRadius = circles[0].radius;
@@ -735,31 +873,35 @@ class Distribution extends Generic<Record<string, any>, DistributionState> {
         for (let i = 1; i <= this.state.rxData.nodesCount; i++) {
             const idx = `object${i}`;
             const _valueAndUnit = this.getValue(this.state.rxData[`oid${i}`], this.state.objects[idx]);
-            const circle = {
+            const circle: Circle = {
                 name: this.state.rxData[`name${i}`],
                 color: this.state.rxData[`color${i}`],
-                radius: (size * (this.state.rxData[`circleSize${i}`] || defaultRadiusSize)) / 100,
-                distance: (size * (this.state.rxData[`distanceSize${i}`] || defaultDistanceSize)) / 100,
-                fontSize: defaultFontSize || this.state.rxData[`fontSize${i}`],
+                radius: (size * (parseFloat(this.state.rxData[`circleSize${i}`] as string) || defaultRadiusSize)) / 100,
+                distance:
+                    (size * (parseFloat(this.state.rxData[`distanceSize${i}`] as string) || defaultDistanceSize)) / 100,
+                fontSize: defaultFontSize || parseFloat(this.state.rxData[`fontSize${i}`] as string),
                 oid: this.state.rxData[`oid${i}`],
                 unit: _valueAndUnit.unit || Generic.t('kwh'),
                 value: _valueAndUnit.value,
                 iValue: _valueAndUnit.iValue,
-                icon: this.state.rxData[`standardIcon${i}`] || this.state.rxData[`icon${i}`] || this.state.objects[`object${i}`]?.common?.icon,
+                icon:
+                    this.state.rxData[`standardIcon${i}`] ||
+                    this.state.rxData[`icon${i}`] ||
+                    this.state.objects[`object${i}`]?.common?.icon,
                 arrow: '',
-                iconSize: parseFloat(this.state.rxData[`iconSize${i}`]) || 33.3,
-                hide: this.state.objects[idx] &&
-                    this.state.objects[idx].hideIfLess !== null &&
+                iconSize: parseFloat(this.state.rxData[`iconSize${i}`] as string) || 33.3,
+                hide:
+                    this.state.objects[idx] &&
+                    this.state.objects[idx].hideIfLess != null &&
                     _valueAndUnit.iValue < this.state.objects[idx].hideIfLess,
                 invert: (this.state.objects[idx] && this.state.objects[idx].invert) || false,
-                speed: parseFloat(this.state.objects[idx] && this.state.objects[idx].speed) || 50,
+                speed: parseFloat((this.state.objects[idx]?.speed as string) || '50') || 50,
                 textColor: this.state.rxData[`textColor${i}`],
                 value2: this.state.rxData[`value2Oid${i}`]
                     ? this.state.values[`${this.state.rxData[`value2Oid${i}`]}.val`]
                     : undefined,
-                value2Unit: this.state.rxData[`value2Unit${i}`]
-                    || this.state.units[this.state.rxData[`value2Oid${i}`]]
-                    || '%',
+                value2Unit:
+                    this.state.rxData[`value2Unit${i}`] || this.state.units[this.state.rxData[`value2Oid${i}`]] || '%',
             };
             circles.push(circle);
 
@@ -776,7 +918,7 @@ class Distribution extends Generic<Record<string, any>, DistributionState> {
         const halfSize = size / 2;
         let max = halfSize;
         let min = halfSize;
-        const allCoordinates: any[] = [];
+        const allCoordinates: { top: number; left: number; leftLabel: number; topLabel?: number }[] = [];
         if (!this.props.editMode) {
             circles = circles.filter(circle => !circle.hide);
         }
@@ -784,15 +926,15 @@ class Distribution extends Generic<Record<string, any>, DistributionState> {
         for (let i = 0; i < circles.length; i++) {
             const angle = 180 + (i * 360) / circles.length;
             const _coordinates = polarToCartesian(0, 0, circles[i].distance + circles[i].radius + homeRadius, angle);
-            const position: any = {
-                top:       halfSize + _coordinates.y - circles[i].radius,
-                left:      halfSize + _coordinates.x - circles[i].radius,
+            const position: { top: number; left: number; leftLabel: number; topLabel?: number } = {
+                top: halfSize + _coordinates.y - circles[i].radius,
+                left: halfSize + _coordinates.x - circles[i].radius,
                 leftLabel: halfSize + _coordinates.x - circles[i].radius,
             };
             if (angle - 180 > 180) {
-                position.topLabel =  halfSize + _coordinates.y + circles[i].radius + 2;
+                position.topLabel = halfSize + _coordinates.y + circles[i].radius + 2;
             } else {
-                position.topLabel =  halfSize + _coordinates.y - circles[i].radius - 6 - circles[i].fontSize;
+                position.topLabel = halfSize + _coordinates.y - circles[i].radius - 6 - circles[i].fontSize;
             }
             allCoordinates.push(position);
             if (max < position.left + circles[i].radius * 2) {
@@ -803,190 +945,241 @@ class Distribution extends Generic<Record<string, any>, DistributionState> {
             }
         }
         // compare with home
-        if (max < (halfSize + homeRadius)) {
+        if (max < halfSize + homeRadius) {
             max = halfSize + homeRadius;
         }
-        if (min > (halfSize - homeRadius)) {
+        if (min > halfSize - homeRadius) {
             min = halfSize - homeRadius;
         }
         // if (Math.abs(size - max - min) > 5) {
         xOffset = (size - max - min) / 2;
         // }
-        const homeIconSize = parseFloat(this.state.rxData.homeIconSize) || 66.6;
+        const homeIconSize = parseFloat(this.state.rxData.homeIconSize as string) || 66.6;
 
-        const content = <div
-            ref={this.refCardContent}
-            style={styles.cardContent}
-        >
-            {size && <div style={{ position: 'relative' }}>
-                {/* show power line and others */}
-                {circles.map((circle, i) => {
-                    const icon = circle.icon && circle.icon.startsWith('_PRJ_NAME/') ?
-                        `${this.props.context.adapterName}.${this.props.context.instance}/${this.props.context.projectName}${circle.icon.substring(9)}`
-                        :
-                        circle.icon;
+        const content = (
+            <div
+                ref={this.refCardContent}
+                style={styles.cardContent}
+            >
+                {size && (
+                    <div style={{ position: 'relative' }}>
+                        {/* show power line and others */}
+                        {circles.map((circle, i) => {
+                            const icon =
+                                circle.icon && circle.icon.startsWith('_PRJ_NAME/')
+                                    ? `${this.props.context.adapterName}.${this.props.context.instance}/${this.props.context.projectName}${circle.icon.substring(9)}`
+                                    : circle.icon;
 
-                    return <div key={i}>
+                            return (
+                                <div key={i}>
+                                    <div
+                                        className="vis-2-distribution-circle-value"
+                                        style={{
+                                            ...styles.circleContent,
+                                            top: allCoordinates[i].top,
+                                            left: xOffset + allCoordinates[i].left,
+                                            width: circle.radius * 2,
+                                            height: circle.radius * 2,
+                                            fontSize: circle.fontSize,
+                                            opacity: circle.hide ? 0.3 : 1,
+                                        }}
+                                    >
+                                        {icon ? (
+                                            <Icon
+                                                src={icon}
+                                                style={{
+                                                    width: Math.round(circle.radius * (circle.iconSize / 100) * 2),
+                                                    height: Math.round(circle.radius * (circle.iconSize / 100) * 2),
+                                                }}
+                                            />
+                                        ) : null}
+                                        {circle.secondaryValue?.value !== undefined ? (
+                                            <div style={{ color: this.state.rxData.powerLineReturnColor }}>
+                                                {`${circle.secondaryArrow}${circle.secondaryValue.value} ${circle.secondaryValue.unit || Generic.t('kwh')}`}
+                                            </div>
+                                        ) : null}
+                                        {circle.value !== undefined ? (
+                                            <div>{`${circle.arrow}${circle.value} ${circle.unit}`}</div>
+                                        ) : null}
+                                        {circle.value2 !== undefined && circle.value2 !== null ? (
+                                            <div>
+                                                {`${circle.value2}${circle.value2Unit ? ` ${circle.value2Unit}` : ''}`}
+                                            </div>
+                                        ) : null}
+                                    </div>
+                                    <div
+                                        className={Utils.clsx(
+                                            'vis-2-distribution-circle-text',
+                                            `vis-2-distribution-circle-text-${i}`,
+                                        )}
+                                        style={{
+                                            ...styles.circleContent,
+                                            top: allCoordinates[i].topLabel,
+                                            left: xOffset + allCoordinates[i].leftLabel,
+                                            width: circle.radius * 2,
+                                            fontSize: circle.fontSize,
+                                            opacity: circle.hide ? 0.3 : 1,
+                                            whiteSpace: 'nowrap',
+                                            color: circle.textColor,
+                                        }}
+                                    >
+                                        <div>{circle.name || circle.oid}</div>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                        {/* show home icon and value in the middle of the circle */}
                         <div
-                            className="vis-2-distribution-circle-value"
                             style={{
                                 ...styles.circleContent,
-                                top:      allCoordinates[i].top,
-                                left:     xOffset + allCoordinates[i].left,
-                                width:    circle.radius * 2,
-                                height:   circle.radius * 2,
-                                fontSize: circle.fontSize,
-                                opacity:  circle.hide ? 0.3 : 1,
+                                top: halfSize - homeRadius,
+                                left: xOffset + halfSize - homeRadius,
+                                width: homeRadius * 2,
+                                height: homeRadius * 2,
+                                fontSize: homeFontSize,
                             }}
                         >
-                            {icon ?
-                                <Icon src={icon} style={{ width: Math.round(circle.radius * (circle.iconSize / 100) * 2), height: Math.round(circle.radius * (circle.iconSize / 100) * 2) }} />
+                            {homeIcon ? (
+                                <Icon
+                                    src={homeIcon}
+                                    style={{
+                                        width: Math.round(homeRadius * (homeIconSize / 100) * 2),
+                                        height: Math.round(homeRadius * (homeIconSize / 100) * 2),
+                                    }}
+                                />
+                            ) : null}
+                            {homeValueAndUnit.value !== undefined ? (
+                                <div>{`${homeValueAndUnit.value} ${homeValueAndUnit.unit || Generic.t('kwh')}`}</div>
+                            ) : null}
+                        </div>
+                        {/* show home name at the bottom of the circle */}
+                        <div
+                            style={{
+                                ...styles.circleContent,
+                                top: halfSize + homeRadius,
+                                left: xOffset + halfSize - homeRadius,
+                                width: homeRadius * 2,
+                                fontSize: homeFontSize,
+                            }}
+                        >
+                            <div style={{ color: this.state.rxData.homeTextColor }}>
+                                {this.state.rxData.homeName || this.state.rxData['home-oid'] || Generic.t('home')}
+                            </div>
+                        </div>
+                        <svg style={{ width: size, height: size, overflow: 'visible' }}>
+                            {valuesSum
+                                ? circles.map((circle, i) => {
+                                      // Show parts of home circle
+                                      const partRadiusStroke =
+                                          ((valuesSum -
+                                              (Number.isFinite(circle.iValue) ? Math.abs(circle.iValue) : 0)) /
+                                              valuesSum) *
+                                          (Math.PI * (homeRadius * 2));
+                                      const result = (
+                                          <circle
+                                              key={i}
+                                              cx="50%"
+                                              cy="50%"
+                                              r={homeRadius}
+                                              fill="none"
+                                              stroke={
+                                                  circle.color ||
+                                                  this.state.rxData.homeColor ||
+                                                  this.props.context.theme.palette.text.primary
+                                              }
+                                              style={{
+                                                  strokeDashoffset: partRadiusStroke,
+                                                  strokeDasharray: Math.PI * (homeRadius * 2),
+                                                  transition: 'stroke-dashoffset 0.5s linear',
+                                              }}
+                                              transform={`translate(${xOffset}, 0), rotate(${Math.round((currentPart / valuesSum) * 360 + 135)},${halfSize},${halfSize})`}
+                                              strokeWidth="3"
+                                          />
+                                      );
+                                      currentPart += Number.isFinite(circle.iValue) ? Math.abs(circle.iValue) : 0;
+                                      return result;
+                                  })
                                 : null}
-                            {circle.secondaryValue?.value !== undefined ? <div style={{ color: this.state.rxData.powerLineReturnColor }}>
-                                {`${circle.secondaryArrow}${circle.secondaryValue.value} ${circle.secondaryValue.unit || Generic.t('kwh')}`}
-                            </div> : null}
-                            {circle.value !== undefined ? <div>
-                                {`${circle.arrow}${circle.value} ${circle.unit}`}
-                            </div> : null}
-                            {circle.value2 !== undefined && circle.value2 !== null ? <div>
-                                {`${circle.value2}${circle.value2Unit ? ` ${circle.value2Unit}` : ''}`}
-                            </div> : null}
-                        </div>
-                        <div
-                            className={Utils.clsx('vis-2-distribution-circle-text', `vis-2-distribution-circle-text-${i}`)}
-                            style={{
-                                ...styles.circleContent,
-                                top: allCoordinates[i].topLabel,
-                                left: xOffset + allCoordinates[i].leftLabel,
-                                width: circle.radius * 2,
-                                fontSize: circle.fontSize,
-                                opacity:  circle.hide ? 0.3 : 1,
-                                whiteSpace: 'nowrap',
-                                color: circle.textColor,
-                            }}
-                        >
-                            <div>{circle.name || circle.oid}</div>
-                        </div>
-                    </div>;
-                })}
-                {/* show home icon and value in the middle of the circle */}
-                <div
-                    style={{
-                        ...styles.circleContent,
-                        top: halfSize - homeRadius,
-                        left: xOffset + halfSize - homeRadius,
-                        width: homeRadius * 2,
-                        height: homeRadius * 2,
-                        fontSize: homeFontSize,
-                    }}
-                >
-                    {homeIcon ?
-                        <Icon src={homeIcon} style={{ width: Math.round(homeRadius * (homeIconSize / 100) * 2), height: Math.round(homeRadius * (homeIconSize / 100) * 2) }} />
-                        : null}
-                    {homeValueAndUnit.value !== undefined ? <div>
-                        {`${homeValueAndUnit.value} ${homeValueAndUnit.unit || Generic.t('kwh')}`}
-                    </div> : null}
-                </div>
-                {/* show home name at the bottom of the circle */}
-                <div
-                    style={{
-                        ...styles.circleContent,
-                        top: halfSize + homeRadius,
-                        left: xOffset + halfSize - homeRadius,
-                        width: homeRadius * 2,
-                        fontSize: homeFontSize,
-                    }}
-                >
-                    <div style={{ color: this.state.rxData.homeTextColor }}>{this.state.rxData.homeName || this.state.rxData['home-oid'] || Generic.t('home')}</div>
-                </div>
-                <svg style={{ width: size, height: size, overflow: 'visible' }}>
-                    {valuesSum ? circles.map((circle, i) => {
-                        // Show parts of home circle
-                        const partRadiusStroke = ((valuesSum - (Number.isFinite(circle.iValue) ? Math.abs(circle.iValue) : 0)) / valuesSum) * (Math.PI * (homeRadius * 2));
-                        const result = <circle
-                            key={i}
-                            cx="50%"
-                            cy="50%"
-                            r={homeRadius}
-                            fill="none"
-                            stroke={circle.color || this.state.rxData.homeColor || this.props.context.theme.palette.text.primary}
-                            style={{
-                                strokeDashoffset: partRadiusStroke,
-                                strokeDasharray: Math.PI * (homeRadius * 2),
-                                transition: 'stroke-dashoffset 0.5s linear',
-                            }}
-                            transform={`translate(${xOffset}, 0), rotate(${Math.round((currentPart / valuesSum) * 360 + 135)},${halfSize},${halfSize})`}
-                            strokeWidth="3"
-                        />;
-                        currentPart += Number.isFinite(circle.iValue) ? Math.abs(circle.iValue) : 0;
-                        return result;
-                    }) : null}
-                    {circles.map((circle, i) => {
-                        // Show connection lines with moving circle
-                        const angle           = 180 + (i * 360) / circles.length;
-                        const coordinates     = polarToCartesian(0, 0, circle.distance + circle.radius + homeRadius, angle);
-                        const coordinatesFrom = polarToCartesian(0, 0, homeRadius, angle);
-                        const coordinatesTo   = polarToCartesian(0, 0, homeRadius + circle.distance, angle);
-                        let step = Number.isFinite(circle.iValue) ? Math.abs(circle.iValue) / circle.speed : 0;
-                        if (step > 2) {
-                            step = 2;
-                        }
-                        let offset = (this.state.offset * step + i * 10) % circle.distance;
-                        if (circle.invert) {
-                            if (circle.iValue < 0) {
-                                offset = circle.distance - offset;
-                            }
-                        } else if (circle.iValue > 0) {
-                            offset = circle.distance - offset;
-                        }
+                            {circles.map((circle, i) => {
+                                // Show connection lines with moving circle
+                                const angle = 180 + (i * 360) / circles.length;
+                                const coordinates = polarToCartesian(
+                                    0,
+                                    0,
+                                    circle.distance + circle.radius + homeRadius,
+                                    angle,
+                                );
+                                const coordinatesFrom = polarToCartesian(0, 0, homeRadius, angle);
+                                const coordinatesTo = polarToCartesian(0, 0, homeRadius + circle.distance, angle);
+                                let step = Number.isFinite(circle.iValue) ? Math.abs(circle.iValue) / circle.speed : 0;
+                                if (step > 2) {
+                                    step = 2;
+                                }
+                                let offset = (this.state.offset * step + i * 10) % circle.distance;
+                                if (circle.invert) {
+                                    if (circle.iValue < 0) {
+                                        offset = circle.distance - offset;
+                                    }
+                                } else if (circle.iValue > 0) {
+                                    offset = circle.distance - offset;
+                                }
 
-                        const coordinatesOffset = polarToCartesian(0, 0, homeRadius + offset, angle);
-                        const color = circle.color || this.state.rxData.defaultColor || this.props.context.theme.palette.text.primary;
+                                const coordinatesOffset = polarToCartesian(0, 0, homeRadius + offset, angle);
+                                const color =
+                                    circle.color ||
+                                    this.state.rxData.defaultColor ||
+                                    this.props.context.theme.palette.text.primary;
 
-                        return <React.Fragment key={i}>
+                                return (
+                                    <React.Fragment key={i}>
+                                        <circle
+                                            cx="50%"
+                                            cy="50%"
+                                            r={circle.radius}
+                                            fill="none"
+                                            opacity={circle.hide ? 0.3 : 1}
+                                            stroke={color}
+                                            strokeWidth="3"
+                                            transform={`translate(${xOffset + coordinates.x}, ${coordinates.y})`}
+                                        />
+                                        <line
+                                            x1={xOffset + halfSize + coordinatesFrom.x}
+                                            y1={halfSize + coordinatesFrom.y}
+                                            x2={xOffset + halfSize + coordinatesTo.x}
+                                            y2={halfSize + coordinatesTo.y}
+                                            stroke={color}
+                                            opacity={circle.hide ? 0.3 : 1}
+                                        />
+                                        {circle.iValue ? (
+                                            <circle
+                                                cx="50%"
+                                                cy="50%"
+                                                r={step < 0.5 ? 1.5 : step * 3}
+                                                fill={color}
+                                                stroke={color}
+                                                strokeWidth="3"
+                                                opacity={circle.hide ? 0.3 : 1}
+                                                transform={`translate(${xOffset + coordinatesOffset.x}, ${coordinatesOffset.y})`}
+                                            />
+                                        ) : null}
+                                    </React.Fragment>
+                                );
+                            })}
+                            {/* show home circle as last to overdraw all lines */}
                             <circle
                                 cx="50%"
                                 cy="50%"
-                                r={circle.radius}
+                                r={homeRadius}
+                                transform={`translate(${xOffset}, 0)`}
                                 fill="none"
-                                opacity={circle.hide ? 0.3 : 1}
-                                stroke={color}
+                                stroke={this.state.rxData.homeColor || this.props.context.theme.palette.text.primary}
                                 strokeWidth="3"
-                                transform={`translate(${xOffset + coordinates.x}, ${coordinates.y})`}
                             />
-                            <line
-                                x1={xOffset + halfSize + coordinatesFrom.x}
-                                y1={halfSize + coordinatesFrom.y}
-                                x2={xOffset + halfSize + coordinatesTo.x}
-                                y2={halfSize + coordinatesTo.y}
-                                stroke={color}
-                                opacity={circle.hide ? 0.3 : 1}
-                            />
-                            {circle.iValue ? <circle
-                                cx="50%"
-                                cy="50%"
-                                r={step < 0.5 ? 1.5 : step * 3}
-                                fill={color}
-                                stroke={color}
-                                strokeWidth="3"
-                                opacity={circle.hide ? 0.3 : 1}
-                                transform={`translate(${xOffset + coordinatesOffset.x}, ${coordinatesOffset.y})`}
-                            /> : null}
-                        </React.Fragment>;
-                    })}
-                    {/* show home circle as last to overdraw all lines */}
-                    <circle
-                        cx="50%"
-                        cy="50%"
-                        r={homeRadius}
-                        transform={`translate(${xOffset}, 0)`}
-                        fill="none"
-                        stroke={this.state.rxData.homeColor || this.props.context.theme.palette.text.primary}
-                        strokeWidth="3"
-                    />
-                </svg>
-            </div>}
-        </div>;
+                        </svg>
+                    </div>
+                )}
+            </div>
+        );
 
         if (this.state.rxData.noCard || props.widget.usedInWidget) {
             return content;

@@ -8,15 +8,17 @@ export default [
     {
         languageOptions: {
             parserOptions: {
-                projectService: {
-                    allowDefaultProject: ['*.mjs'],
-                },
+                // No allowDefaultProject here: the root tsconfig.json already includes "*.mjs",
+                // and listing the same files in both makes the project service refuse to parse
+                // them ("was included by allowDefaultProject but also was found in the project
+                // service").
+                projectService: true,
                 tsconfigRootDir: import.meta.dirname,
             },
         },
     },
     {
-        // React widget sources. Add the react plugin config and relax a set of
+        // React widget sources. Add the React plugin config and relax a set of
         // rules that are too noisy for these (migrated) legacy sources.
         files: ['src-widgets/src/**/*.{ts,tsx}'],
         ...react.configs.flat.recommended,
@@ -70,6 +72,9 @@ export default [
             'node_modules/**/*',
             'src-widgets/node_modules/**/*',
             'src-widgets/build/**/*',
+            // Dev-only stub of the web adapter, served verbatim - not a source file and not
+            // covered by any tsconfig, so the project service cannot parse it.
+            'src-widgets/public/**/*',
             'widgets/**/*',
             'test/**/*',
             'build/**/*',

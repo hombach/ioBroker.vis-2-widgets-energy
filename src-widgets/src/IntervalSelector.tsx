@@ -3,15 +3,15 @@ import moment from 'moment';
 
 import { Button, ButtonGroup, IconButton } from '@mui/material';
 import { NavigateBefore as NavigateBeforeIcon, NavigateNext as NavigateNextIcon } from '@mui/icons-material';
-import type { RxRenderWidgetProps, RxWidgetInfo, VisRxWidgetState } from '@iobroker/types-vis-2';
+import type { RxRenderWidgetProps, RxWidgetInfo, VisRxData, VisRxWidgetState } from '@iobroker/types-vis-2';
 import Generic from './Generic';
 import { getFromToTime } from './Utils';
 
-type EventHandler = (event: string, value?: any) => void;
-
-interface IntervalSelectorState extends VisRxWidgetState {
-    object?: ioBroker.Object | null;
-}
+type EventHandler = (event: 'unmount' | 'update', value?: { start: number; interval: number }) => void;
+export type HTMLDiv = HTMLDivElement & {
+    _addEventHandler?: ((cb: EventHandler) => void) | null;
+    _removeEventHandler?: ((cb: EventHandler) => void) | null;
+};
 
 const styles: Record<string, React.CSSProperties> = {
     nowButton: {
@@ -35,8 +35,15 @@ const styles: Record<string, React.CSSProperties> = {
     },
 };
 
-class IntervalSelector extends Generic<Record<string, any>, IntervalSelectorState> {
-    private readonly refTimeSelector: React.RefObject<HTMLDivElement> = React.createRef();
+interface IntervalSelectorRxData extends VisRxData {
+    noCard: boolean;
+    widgetTitle: string;
+    'timeStart-oid': string;
+    'timeInterval-oid': string;
+}
+
+export default class IntervalSelector extends Generic<IntervalSelectorRxData, VisRxWidgetState> {
+    private readonly refTimeSelector: React.RefObject<HTMLDiv> = React.createRef();
 
     private eventHandlers: EventHandler[] = [];
 
@@ -48,33 +55,35 @@ class IntervalSelector extends Generic<Record<string, any>, IntervalSelectorStat
         return {
             id: 'tplEnergy2IntervalSelector',
             visSet: 'vis-2-widgets-energy',
-            visWidgetLabel: 'interval_selector',  // Label of widget
+            visWidgetLabel: 'interval_selector', // Label of widget
             visName: 'Interval selector',
-            visAttrs: [{
-                name: 'common',
-                fields: [
-                    {
-                        name: 'noCard',
-                        label: 'without_card',
-                        type: 'checkbox',
-                    },
-                    {
-                        name: 'widgetTitle',
-                        label: 'name',
-                        hidden: '!!data.noCard',
-                    },
-                    {
-                        name: 'timeStart-oid',
-                        type: 'id',
-                        label: 'time_start_oid',
-                    },
-                    {
-                        name: 'timeInterval-oid',
-                        type: 'id',
-                        label: 'time_interval_oid',
-                    },
-                ],
-            }],
+            visAttrs: [
+                {
+                    name: 'common',
+                    fields: [
+                        {
+                            name: 'noCard',
+                            label: 'without_card',
+                            type: 'checkbox',
+                        },
+                        {
+                            name: 'widgetTitle',
+                            label: 'name',
+                            hidden: '!!data.noCard',
+                        },
+                        {
+                            name: 'timeStart-oid',
+                            type: 'id',
+                            label: 'time_start_oid',
+                        },
+                        {
+                            name: 'timeInterval-oid',
+                            type: 'id',
+                            label: 'time_interval_oid',
+                        },
+                    ],
+                },
+            ],
             visDefaultStyle: {
                 width: 320,
                 height: 60,
@@ -84,20 +93,16 @@ class IntervalSelector extends Generic<Record<string, any>, IntervalSelectorStat
         };
     }
 
-    async propertiesUpdate() {
-        if (this.state.rxData.oid && this.state.rxData.oid !== 'nothing_selected') {
-            const obj = await this.props.context.socket.getObject(this.state.rxData.oid);
-            this.setState({ object: obj });
-        }
-        const el = this.refTimeSelector.current as any;
+    propertiesUpdate() {
+        const el = this.refTimeSelector.current;
         if (el && !el._addEventHandler) {
-            el._addEventHandler = (cb: EventHandler) => {
+            el._addEventHandler = (cb: EventHandler): void => {
                 if (!this.eventHandlers.includes(cb)) {
                     this.eventHandlers.push(cb);
                     this.informSubscribers();
                 }
             };
-            el._removeEventHandler = (cb: EventHandler) => {
+            el._removeEventHandler = (cb: EventHandler): void => {
                 const pos = this.eventHandlers.indexOf(cb);
                 if (pos !== -1) {
                     this.eventHandlers.splice(pos, 1);
@@ -106,14 +111,14 @@ class IntervalSelector extends Generic<Record<string, any>, IntervalSelectorStat
         }
     }
 
-    componentDidMount() {
+    componentDidMount(): void {
         super.componentDidMount();
         this.propertiesUpdate();
     }
 
     componentWillUnmount() {
         this.eventHandlers.forEach(cb => cb('unmount'));
-        const el = this.refTimeSelector.current as any;
+        const el = this.refTimeSelector.current;
         if (el) {
             el._addEventHandler = null;
             el._removeEventHandler = null;
@@ -130,9 +135,9 @@ class IntervalSelector extends Generic<Record<string, any>, IntervalSelectorStat
     }
 
     getTimeStart() {
-        return this.state.rxData['timeStart-oid'] ?
-            this.state.values[`${this.state.rxData['timeStart-oid']}.val`] :
-            this.props.context.timeStart;
+        return this.state.rxData['timeStart-oid']
+            ? this.state.values[`${this.state.rxData['timeStart-oid']}.val`]
+            : this.props.context.timeStart;
     }
 
     setTimeStart = (timeStart: number | null) => {
@@ -145,9 +150,9 @@ class IntervalSelector extends Generic<Record<string, any>, IntervalSelectorStat
     };
 
     getTimeInterval() {
-        return this.state.rxData['timeInterval-oid'] ?
-            this.state.values[`${this.state.rxData['timeInterval-oid']}.val`] :
-            this.props.context.timeInterval;
+        return this.state.rxData['timeInterval-oid']
+            ? this.state.values[`${this.state.rxData['timeInterval-oid']}.val`]
+            : this.props.context.timeInterval;
     }
 
     informSubscribers(start?: any, interval?: any) {
@@ -200,93 +205,95 @@ class IntervalSelector extends Generic<Record<string, any>, IntervalSelectorStat
         if (this.getTimeInterval() === 'day') {
             periodName = moment(interval.from).format('DD.MM.YYYY');
         } else if (this.getTimeInterval() === 'week') {
-            periodName = <>
-                {moment(new Date(interval.from)).format('DD.MM')}
-                {' '}
-                &mdash;
-                {' '}
-                {moment(interval.to).format('DD.MM')}
-            </>;
+            periodName = (
+                <>
+                    {moment(new Date(interval.from)).format('DD.MM')} &mdash; {moment(interval.to).format('DD.MM')}
+                </>
+            );
         } else if (this.getTimeInterval() === 'month') {
             periodName = moment(new Date(interval.from)).format('MM.YYYY');
         } else if (this.getTimeInterval() === 'year') {
             periodName = moment(new Date(interval.from)).format('YYYY');
         }
 
-        const content = <div
-            style={styles.contentContainer}
-            className="time-selector"
-            ref={this.refTimeSelector}
-        >
-            <div style={styles.content}>
-                <span style={styles.periodName}>{periodName}</span>
-                <IconButton onClick={() => {
-                    const newEnd = new Date(interval.from);
-                    if (this.getTimeInterval() === 'day') {
-                        newEnd.setDate(newEnd.getDate() - 1);
-                    } else if (this.getTimeInterval() === 'week') {
-                        newEnd.setDate(newEnd.getDate() - 7);
-                    } else if (this.getTimeInterval() === 'month') {
-                        newEnd.setMonth(newEnd.getMonth() - 1);
-                    } else if (this.getTimeInterval() === 'year') {
-                        newEnd.setFullYear(newEnd.getFullYear() - 1);
-                    }
-                    this.setTimeStart(newEnd.getTime());
-                }}
-                >
-                    <NavigateBeforeIcon />
-                </IconButton>
-                <IconButton
-                    disabled={!this.getTimeStart()}
-                    onClick={() => {
-                        const newEnd = new Date(interval.from);
-                        if (this.getTimeInterval() === 'day') {
-                            newEnd.setDate(newEnd.getDate() + 1);
-                        } else if (this.getTimeInterval() === 'week') {
-                            newEnd.setDate(newEnd.getDate() + 7);
-                        } else if (this.getTimeInterval() === 'month') {
-                            newEnd.setMonth(newEnd.getMonth() + 1);
-                        } else if (this.getTimeInterval() === 'year') {
-                            newEnd.setFullYear(newEnd.getFullYear() + 1);
-                        }
-                        this.setTimeStart(
-                            getFromToTime(newEnd, this.getTimeInterval()).from.getTime() >= getFromToTime(null, this.getTimeInterval()).from.getTime()
-                                ? null
-                                : newEnd.getTime(),
-                        );
-                    }}
-                >
-
-                    <NavigateNextIcon />
-                </IconButton>
-                <Button
-                    variant="contained"
-                    color="grey"
-                    disabled={!this.getTimeStart()}
-                    onClick={() => this.setTimeStart(0)}
-                    style={styles.nowButton}
-                >
-                    {Generic.t('now')}
-                </Button>
-                <ButtonGroup>
-                    {['day', 'week', 'month', 'year'].map(period =>
-                        <Button
-                            key={period}
-                            variant="contained"
-                            color={period === this.getTimeInterval() ? 'primary' : 'grey'}
-                            onClick={() => {
-                                if (period === this.getTimeInterval()) {
-                                    return;
-                                }
-                                this.setTimeInterval(period);
-                                this.setTimeStart(0);
-                            }}
-                        >
-                            {Generic.t(`${period}`)}
-                        </Button>)}
-                </ButtonGroup>
+        const content = (
+            <div
+                style={styles.contentContainer}
+                className="time-selector"
+                ref={this.refTimeSelector}
+            >
+                <div style={styles.content}>
+                    <span style={styles.periodName}>{periodName}</span>
+                    <IconButton
+                        onClick={() => {
+                            const newEnd = new Date(interval.from);
+                            if (this.getTimeInterval() === 'day') {
+                                newEnd.setDate(newEnd.getDate() - 1);
+                            } else if (this.getTimeInterval() === 'week') {
+                                newEnd.setDate(newEnd.getDate() - 7);
+                            } else if (this.getTimeInterval() === 'month') {
+                                newEnd.setMonth(newEnd.getMonth() - 1);
+                            } else if (this.getTimeInterval() === 'year') {
+                                newEnd.setFullYear(newEnd.getFullYear() - 1);
+                            }
+                            this.setTimeStart(newEnd.getTime());
+                        }}
+                    >
+                        <NavigateBeforeIcon />
+                    </IconButton>
+                    <IconButton
+                        disabled={!this.getTimeStart()}
+                        onClick={() => {
+                            const newEnd = new Date(interval.from);
+                            if (this.getTimeInterval() === 'day') {
+                                newEnd.setDate(newEnd.getDate() + 1);
+                            } else if (this.getTimeInterval() === 'week') {
+                                newEnd.setDate(newEnd.getDate() + 7);
+                            } else if (this.getTimeInterval() === 'month') {
+                                newEnd.setMonth(newEnd.getMonth() + 1);
+                            } else if (this.getTimeInterval() === 'year') {
+                                newEnd.setFullYear(newEnd.getFullYear() + 1);
+                            }
+                            this.setTimeStart(
+                                getFromToTime(newEnd, this.getTimeInterval()).from.getTime() >=
+                                    getFromToTime(null, this.getTimeInterval()).from.getTime()
+                                    ? null
+                                    : newEnd.getTime(),
+                            );
+                        }}
+                    >
+                        <NavigateNextIcon />
+                    </IconButton>
+                    <Button
+                        variant="contained"
+                        color="grey"
+                        disabled={!this.getTimeStart()}
+                        onClick={() => this.setTimeStart(0)}
+                        style={styles.nowButton}
+                    >
+                        {Generic.t('now')}
+                    </Button>
+                    <ButtonGroup>
+                        {['day', 'week', 'month', 'year'].map(period => (
+                            <Button
+                                key={period}
+                                variant="contained"
+                                color={period === this.getTimeInterval() ? 'primary' : 'grey'}
+                                onClick={() => {
+                                    if (period === this.getTimeInterval()) {
+                                        return;
+                                    }
+                                    this.setTimeInterval(period);
+                                    this.setTimeStart(0);
+                                }}
+                            >
+                                {Generic.t(`${period}`)}
+                            </Button>
+                        ))}
+                    </ButtonGroup>
+                </div>
             </div>
-        </div>;
+        );
 
         if (this.state.rxData.noCard || props.widget.usedInWidget) {
             return content;
@@ -295,5 +302,3 @@ class IntervalSelector extends Generic<Record<string, any>, IntervalSelectorStat
         return this.wrapContent(content, null, { textAlign: 'center', padding: 0, height: '100%' });
     }
 }
-
-export default IntervalSelector;

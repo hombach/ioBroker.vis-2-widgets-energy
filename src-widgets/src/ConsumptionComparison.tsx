@@ -1,16 +1,15 @@
 import React from 'react';
-import { Box } from '@mui/material';
+import { Box, type SxProps } from '@mui/material';
 
-import ReactEchartsCore from 'echarts-for-react';
-import type { RxRenderWidgetProps, RxWidgetInfo, VisRxWidgetState } from '@iobroker/types-vis-2';
+import ReactEchartsCore, { type EChartsOption } from 'echarts-for-react';
+import type { RxRenderWidgetProps, RxWidgetInfo, VisRxData, VisRxWidgetState, WidgetData } from '@iobroker/types-vis-2';
 import Generic from './Generic';
 
 interface ConsumptionComparisonState extends VisRxWidgetState {
-    units?: any[];
-    [key: string]: any;
+    units?: string[];
 }
 
-const styles: Record<string, any> = {
+const styles: Record<string, SxProps> = {
     cardContent: {
         flex: 1,
         display: 'flex',
@@ -27,14 +26,38 @@ const styles: Record<string, any> = {
     },
 };
 
-class ConsumptionComparison extends Generic<Record<string, any>, ConsumptionComparisonState> {
+interface ConsumptionComparisonRxData extends VisRxData {
+    noCard: boolean;
+    type: 'bar' | 'pie';
+    noAnimation: boolean;
+    animationDuration: string;
+    innerRadius: string | number;
+    innerTitle: string;
+    inner_oid: string;
+    innerUnit: string;
+    legend: boolean;
+    legendHeight: number;
+    hideLabels: boolean;
+    precision: number;
+    widgetTitle: string;
+    devicesCount: number;
+
+    // Dynamic fields for devices
+    [key: `oid${string}`]: string;
+    [key: `name${string}`]: string;
+    [key: `color${string}`]: string;
+    [key: `unit${string}`]: string;
+    [key: `factor${string}`]: string | number;
+}
+
+class ConsumptionComparison extends Generic<ConsumptionComparisonRxData, ConsumptionComparisonState> {
     private readonly refCardContent: React.RefObject<HTMLDivElement | null> = React.createRef();
 
     static getWidgetInfo(): RxWidgetInfo {
         return {
             id: 'tplEnergy2ConsumptionComparison',
             visSet: 'vis-2-widgets-energy',
-            visWidgetLabel: 'consumption_comparison',  // Label of widget
+            visWidgetLabel: 'consumption_comparison', // Label of widget
             visName: 'Consumption comparison',
             visAttrs: [
                 {
@@ -65,7 +88,7 @@ class ConsumptionComparison extends Generic<Record<string, any>, ConsumptionComp
                             label: 'animation_duration',
                             type: 'number',
                             default: 1000,
-                            hidden: (data: any) => !!data.noAnimation,
+                            hidden: (data: WidgetData) => !!data.noAnimation,
                         },
                         {
                             name: 'innerRadius',
@@ -87,7 +110,7 @@ class ConsumptionComparison extends Generic<Record<string, any>, ConsumptionComp
                             type: 'id',
                             hidden: 'data.type !== "pie"',
                             onChange: async (field, data, changeData, socket) => {
-                                const object = data[field.name!] ? (await socket.getObject(data[field.name!])) : null;
+                                const object = data[field.name!] ? await socket.getObject(data[field.name!]) : null;
                                 if (object?.common?.unit) {
                                     data.innerUnit = object.common.unit;
                                     changeData(data);
@@ -155,9 +178,9 @@ class ConsumptionComparison extends Generic<Record<string, any>, ConsumptionComp
                             type: 'id',
                             label: 'oid',
                             onChange: async (field, data, changeData, socket) => {
-                                const object = data[field.name!] ? (await socket.getObject(data[field.name!])) : null;
+                                const object = data[field.name!] ? await socket.getObject(data[field.name!]) : null;
                                 if (object?.common) {
-                                    data[`color${field.index}`] = object.common.color !== undefined ? object.common.color : null;
+                                    data[`color${field.index}`] = object.common.color ?? null;
                                     data[`name${field.index}`] = Generic.getText(object.common.name);
                                     changeData(data);
                                 }
@@ -190,7 +213,7 @@ class ConsumptionComparison extends Generic<Record<string, any>, ConsumptionComp
                                 { value: 0.01, label: '0.01' },
                                 { value: 0.001, label: '0.001' },
                             ],
-                            default: 1 as any,
+                            default: '1',
                         },
                     ],
                 },
@@ -208,11 +231,15 @@ class ConsumptionComparison extends Generic<Record<string, any>, ConsumptionComp
         const units = [];
         const ids = [];
         for (let i = 1; i <= this.state.rxData.devicesCount; i++) {
-            if (!this.state.rxData[`unit${i}`] && this.state.rxData[`oid${i}`] && this.state.rxData[`oid${i}`] !== 'nothing_selected') {
+            if (
+                !this.state.rxData[`unit${i}`] &&
+                this.state.rxData[`oid${i}`] &&
+                this.state.rxData[`oid${i}`] !== 'nothing_selected'
+            ) {
                 ids.push(this.state.rxData[`oid${i}`]);
             }
         }
-        const _objects = ids.length ? (await this.props.context.socket.getObjectsById(ids)) : {};
+        const _objects = ids.length ? await this.props.context.socket.getObjectsById(ids) : {};
 
         for (let i = 1; i <= this.state.rxData.devicesCount; i++) {
             if (!this.state.rxData[`unit${i}`]) {
@@ -243,16 +270,12 @@ class ConsumptionComparison extends Generic<Record<string, any>, ConsumptionComp
         return ConsumptionComparison.getWidgetInfo();
     }
 
-    /**
-     *
-     * @returns {echarts.EChartsOption}
-     */
-    getBarOption() {
-        const data: any[] = [];
+    getBarOption(): EChartsOption {
+        const data: { name: string; value: number; color?: string }[] = [];
         for (let i = 1; i <= this.state.rxData.devicesCount; i++) {
             let value = this.state.values[`${this.state.rxData[`oid${i}`]}.val`] || 0;
             if (this.state.rxData[`factor${i}`] && this.state.rxData[`factor${i}`] !== 1) {
-                value *= this.state.rxData[`factor${i}`];
+                value *= parseFloat(this.state.rxData[`factor${i}`] as string);
             }
             value = Math.round(value * 100) / 100;
 
@@ -272,12 +295,17 @@ class ConsumptionComparison extends Generic<Record<string, any>, ConsumptionComp
         return {
             tooltip: {
                 // formatter: '{b}: {c} kWh',
-                formatter: (params: any /* , ticket, callback */) => `${params.name}: ${params.data.value}${this.state.units && this.state.units[params.dataIndex + 1] ? ` ${this.state.units[params.dataIndex + 1]}` : ''}`,
+                formatter: (params: {
+                    name: string;
+                    data: { value: number };
+                    dataIndex: number;
+                } /* , ticket, callback */) =>
+                    `${params.name}: ${params.data.value}${this.state.units && this.state.units[params.dataIndex + 1] ? ` ${this.state.units[params.dataIndex + 1]}` : ''}`,
             },
-            title:{
+            title: {
                 show: false,
             },
-            legend:{
+            legend: {
                 show: false,
             },
             backgroundColor: 'transparent',
@@ -304,20 +332,16 @@ class ConsumptionComparison extends Generic<Record<string, any>, ConsumptionComp
                     })),
                 },
             ],
-        };
+        } as EChartsOption;
     }
 
-    /**
-     *
-     * @returns {echarts.EChartsOption}
-     */
-    getPieOption() {
-        const data: any[] = [];
+    getPieOption(): EChartsOption {
+        const data: { name: string; value: number; itemStyle?: { color?: string } }[] = [];
         for (let i = 1; i <= this.state.rxData.devicesCount; i++) {
             let value = this.state.values[`${this.state.rxData[`oid${i}`]}.val`] || 0;
-            this.state.rxData[`factor${i}`] = parseFloat(this.state.rxData[`factor${i}`]) || 1;
+            this.state.rxData[`factor${i}`] = parseFloat(this.state.rxData[`factor${i}`] as string) || 1;
             if (this.state.rxData[`factor${i}`] && this.state.rxData[`factor${i}`] !== 1) {
-                value *= this.state.rxData[`factor${i}`];
+                value *= this.state.rxData[`factor${i}`] as number;
             }
             value = Math.round(value * 100) / 100;
 
@@ -344,10 +368,7 @@ class ConsumptionComparison extends Generic<Record<string, any>, ConsumptionComp
 
         const title = {
             show: true,
-            text: [
-                text,
-                textValue,
-            ].filter(t => t).join('\n'),
+            text: [text, textValue].filter(t => t).join('\n'),
             rich: {
                 text: {
                     fontSize: 10,
@@ -366,7 +387,8 @@ class ConsumptionComparison extends Generic<Record<string, any>, ConsumptionComp
         return {
             tooltip: {
                 trigger: 'item',
-                formatter: (params: any) => `${params.name}: ${params.data.value}${this.state.units && this.state.units[params.dataIndex + 1] ? ` ${this.state.units[params.dataIndex + 1]}` : ''}`,
+                formatter: (params: any) =>
+                    `${params.name}: ${params.data.value}${this.state.units && this.state.units[params.dataIndex + 1] ? ` ${this.state.units[params.dataIndex + 1]}` : ''}`,
             },
             title,
             backgroundColor: 'transparent',
@@ -400,7 +422,10 @@ class ConsumptionComparison extends Generic<Record<string, any>, ConsumptionComp
             series: [
                 {
                     type: 'pie',
-                    radius: [`${parseFloat(this.state.rxData.innerRadius) || 0}%`, this.state.rxData.legend ? `${100 - (this.state.rxData.legendHeight || 0)}%` : '100%'],
+                    radius: [
+                        `${parseFloat(this.state.rxData.innerRadius as string) || 0}%`,
+                        this.state.rxData.legend ? `${100 - (this.state.rxData.legendHeight || 0)}%` : '100%',
+                    ],
                     data,
                     percentPrecision: this.state.rxData.precision || 0,
                     label: {
@@ -425,18 +450,22 @@ class ConsumptionComparison extends Generic<Record<string, any>, ConsumptionComp
 
         const option = this.state.rxData.type === 'pie' ? this.getPieOption() : this.getBarOption();
 
-        const content = <Box
-            ref={this.refCardContent}
-            sx={styles.cardContent}
-        >
-            {size && <ReactEchartsCore
-                option={option}
-                theme={(this.props as any).themeType === 'dark' ? 'dark' : ''}
-                className="vis-2-widgets-energy-chart"
-                opts={{ renderer: 'svg' }}
-                style={{ height: size }}
-            />}
-        </Box>;
+        const content = (
+            <Box
+                ref={this.refCardContent}
+                sx={styles.cardContent}
+            >
+                {size && (
+                    <ReactEchartsCore
+                        option={option}
+                        theme={this.props.context.themeType === 'dark' ? 'dark' : ''}
+                        className="vis-2-widgets-energy-chart"
+                        opts={{ renderer: 'svg' }}
+                        style={{ height: size }}
+                    />
+                )}
+            </Box>
+        );
 
         if (this.state.rxData.noCard || props.widget.usedInWidget) {
             return content;

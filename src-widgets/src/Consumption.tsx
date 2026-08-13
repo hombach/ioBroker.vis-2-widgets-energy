@@ -4,14 +4,46 @@ import ReactEchartsCore from 'echarts-for-react';
 import moment from 'moment';
 
 import { I18n } from '@iobroker/adapter-react-v5';
-import type { RxRenderWidgetProps, RxWidgetInfo, VisRxWidgetState } from '@iobroker/types-vis-2';
+import type {
+    RxRenderWidgetProps,
+    RxWidgetInfo,
+    SingleWidgetId,
+    VisBaseWidgetState,
+    VisRxData,
+    VisRxWidgetProps,
+    VisRxWidgetState,
+    WidgetData,
+} from '@iobroker/types-vis-2';
 
 import Generic from './Generic';
 import { getFromToTime } from './Utils';
+import type { HTMLDiv } from './IntervalSelector';
 
 interface ConsumptionState extends VisRxWidgetState {
     loading?: boolean;
-    [key: string]: any;
+    [key: `history${number}`]: Array<{ ts: number; val: number }>;
+}
+
+interface ConsumptionRxData extends VisRxData {
+    noCard: boolean;
+    stacked: boolean;
+    widgetTitle: string;
+    devicesCount: number;
+    timeWidget: SingleWidgetId;
+    'start-oid': string;
+    'interval-oid': string;
+    aggregate:
+        'minmax' | 'max' | 'min' | 'average' | 'total' | 'count' | 'percentile' | 'quantile' | 'integral' | 'none';
+    difference: boolean;
+    percentile: number;
+    quantile: number;
+    integralUnit: number;
+    integralInterpolation?: 'none' | 'linear';
+    [key: `oid${string}`]: string;
+    [key: `name${string}`]: string | undefined;
+    [key: `color${string}`]: string | undefined;
+    [key: `unit${string}`]: string | undefined;
+    [key: `factor${string}`]: string | number | undefined;
 }
 
 const styles: Record<string, React.CSSProperties> = {
@@ -25,10 +57,10 @@ const styles: Record<string, React.CSSProperties> = {
     },
 };
 
-class Consumption extends Generic<Record<string, any>, ConsumptionState> {
+class Consumption extends Generic<ConsumptionRxData, ConsumptionState> {
     private readonly refCardContent: React.RefObject<HTMLDivElement> = React.createRef();
 
-    private timeSelectorRegistered: boolean | string | null = false;
+    private timeSelectorRegistered: false | string | null = false;
 
     private timeSelectorRegisterInterval?: ReturnType<typeof setInterval> | null = null;
 
@@ -38,7 +70,7 @@ class Consumption extends Generic<Record<string, any>, ConsumptionState> {
 
     private timeStart?: number;
 
-    private timeInterval?: string;
+    private timeInterval?: number;
 
     private lastUpdate?: number;
 
@@ -46,146 +78,167 @@ class Consumption extends Generic<Record<string, any>, ConsumptionState> {
         return {
             id: 'tplEnergy2Consumption',
             visSet: 'vis-2-widgets-energy',
-            visWidgetLabel: 'consumption',  // Label of widget
+            visWidgetLabel: 'consumption', // Label of widget
             visName: 'Consumption',
-            visAttrs: [{
-                name: 'common',
-                fields: [
-                    {
-                        name: 'noCard',
-                        label: 'without_card',
-                        type: 'checkbox',
-                    },
-                    {
-                        name: 'stacked',
-                        label: 'stacked',
-                        type: 'checkbox',
-                        default: true,
-                    },
-                    {
-                        name: 'widgetTitle',
-                        label: 'name',
-                        hidden: '!!data.noCard',
-                    },
-                    {
-                        name: 'devicesCount',
-                        type: 'number',
-                        label: 'devices_count',
-                        default: 1,
-                    },
-                    {
-                        name: 'timeWidget',
-                        type: 'widget',
-                        label: 'time_widget',
-                        tpl: 'tplEnergy2IntervalSelector',
-                    },
-                    {
-                        name: 'start-oid',
-                        type: 'id',
-                        hidden: (data: any) => !!data.timeWidget,
-                        label: 'start_oid',
-                        tooltip: 'start_oid_tooltip',
-                    },
-                    {
-                        name: 'interval-oid',
-                        type: 'id',
-                        hidden: (data: any) => !data['start-oid'] || !!data.timeWidget,
-                        label: 'interval_oid',
-                        tooltip: 'start_oid_tooltip',
-                    },
-                ],
-            },
-            {
-                name: 'aggregation',
-                label: 'aggregation',
-                fields: [
-                    {
-                        name: 'aggregate',
-                        label: 'aggregate',
-                        type: 'select',
-                        noTranslation: true,
-                        options: ['minmax', 'max', 'min', 'average', 'total', 'count', 'percentile', 'quantile', 'integral', 'none'],
-                        default: 'max',
-                    },
-                    {
-                        name: 'difference',
-                        label: 'difference',
-                        type: 'checkbox',
-                        tooltip: 'difference_tooltip',
-                        hidden: (data: any) => data.aggregate !== 'max' && data.aggregate !== 'min' && data.aggregate !== 'average' && data.aggregate !== 'none' && data.aggregate !== 'integral',
-                    },
-                    {
-                        name: 'percentile',
-                        default: 50,
-                        type: 'number',
-                        label: 'percentile',
-                        hidden: (data: any) => data.aggregate !== 'percentile',
-                    },
-                    {
-                        name: 'quantile',
-                        default: 0.5,
-                        type: 'number',
-                        label: 'quantile',
-                        hidden: (data: any) => data.aggregate !== 'quantile',
-                    },
-                    {
-                        name: 'integralUnit',
-                        default: 60,
-                        type: 'number',
-                        label: 'integral_unit',
-                        hidden: (data: any) => data.aggregate !== 'integral',
-                    },
-                    {
-                        name: 'integralInterpolation',
-                        default: 'none',
-                        type: 'select',
-                        options: ['linear', 'none'],
-                        label: 'integral_interpolation',
-                        hidden: (data: any) => data.aggregate !== 'integral',
-                    },
-                ],
-            },
-            {
-                name: 'devices',
-                label: 'Value',
-                indexFrom: 1,
-                indexTo: 'devicesCount',
-                fields: [
-                    {
-                        name: 'oid',
-                        type: 'hid',
-                        label: 'oid',
-                        onChange: async (field, data, changeData, socket) => {
-                            const object = await socket.getObject(data[field.name!]);
-                            if (object && object.common) {
-                                data[`color${field.index}`]  = object.common.color !== undefined ? object.common.color : null;
-                                data[`name${field.index}`]  = object.common.name && typeof object.common.name === 'object' ? object.common.name[I18n.getLanguage()] : object.common.name;
-                                changeData(data);
-                            }
+            visAttrs: [
+                {
+                    name: 'common',
+                    fields: [
+                        {
+                            name: 'noCard',
+                            label: 'without_card',
+                            type: 'checkbox',
                         },
-                    },
-                    {
-                        name: 'name',
-                        label: 'name',
-                    },
-                    {
-                        name: 'color',
-                        type: 'color',
-                        label: 'color',
-                    },
-                    {
-                        name: 'unit',
-                        label: 'unit',
-                    },
-                    {
-                        name: 'factor',
-                        label: 'factor',
-                        type: 'number',
-                        default: 1,
-                        tooltip: 'factor_tooltip',
-                    },
-                ],
-            }],
+                        {
+                            name: 'stacked',
+                            label: 'stacked',
+                            type: 'checkbox',
+                            default: true,
+                        },
+                        {
+                            name: 'widgetTitle',
+                            label: 'name',
+                            hidden: '!!data.noCard',
+                        },
+                        {
+                            name: 'devicesCount',
+                            type: 'number',
+                            label: 'devices_count',
+                            default: 1,
+                        },
+                        {
+                            name: 'timeWidget',
+                            type: 'widget',
+                            label: 'time_widget',
+                            tpl: 'tplEnergy2IntervalSelector',
+                        },
+                        {
+                            name: 'start-oid',
+                            type: 'id',
+                            hidden: (data: WidgetData) => !!data.timeWidget,
+                            label: 'start_oid',
+                            tooltip: 'start_oid_tooltip',
+                        },
+                        {
+                            name: 'interval-oid',
+                            type: 'id',
+                            hidden: (data: WidgetData) => !data['start-oid'] || !!data.timeWidget,
+                            label: 'interval_oid',
+                            tooltip: 'start_oid_tooltip',
+                        },
+                    ],
+                },
+                {
+                    name: 'aggregation',
+                    label: 'aggregation',
+                    fields: [
+                        {
+                            name: 'aggregate',
+                            label: 'aggregate',
+                            type: 'select',
+                            noTranslation: true,
+                            options: [
+                                'minmax',
+                                'max',
+                                'min',
+                                'average',
+                                'total',
+                                'count',
+                                'percentile',
+                                'quantile',
+                                'integral',
+                                'none',
+                            ],
+                            default: 'max',
+                        },
+                        {
+                            name: 'difference',
+                            label: 'difference',
+                            type: 'checkbox',
+                            tooltip: 'difference_tooltip',
+                            hidden: (data: WidgetData) =>
+                                data.aggregate !== 'max' &&
+                                data.aggregate !== 'min' &&
+                                data.aggregate !== 'average' &&
+                                data.aggregate !== 'none' &&
+                                data.aggregate !== 'integral',
+                        },
+                        {
+                            name: 'percentile',
+                            default: 50,
+                            type: 'number',
+                            label: 'percentile',
+                            hidden: (data: WidgetData) => data.aggregate !== 'percentile',
+                        },
+                        {
+                            name: 'quantile',
+                            default: 0.5,
+                            type: 'number',
+                            label: 'quantile',
+                            hidden: (data: WidgetData) => data.aggregate !== 'quantile',
+                        },
+                        {
+                            name: 'integralUnit',
+                            default: 60,
+                            type: 'number',
+                            label: 'integral_unit',
+                            hidden: (data: WidgetData) => data.aggregate !== 'integral',
+                        },
+                        {
+                            name: 'integralInterpolation',
+                            default: 'none',
+                            type: 'select',
+                            options: ['linear', 'none'],
+                            label: 'integral_interpolation',
+                            hidden: (data: WidgetData) => data.aggregate !== 'integral',
+                        },
+                    ],
+                },
+                {
+                    name: 'devices',
+                    label: 'Value',
+                    indexFrom: 1,
+                    indexTo: 'devicesCount',
+                    fields: [
+                        {
+                            name: 'oid',
+                            type: 'hid',
+                            label: 'oid',
+                            onChange: async (field, data, changeData, socket) => {
+                                const object = await socket.getObject(data[field.name!]);
+                                if (object?.common) {
+                                    data[`color${field.index}`] = object.common.color ?? null;
+                                    data[`name${field.index}`] =
+                                        object.common.name && typeof object.common.name === 'object'
+                                            ? object.common.name[I18n.getLanguage()]
+                                            : object.common.name;
+                                    changeData(data);
+                                }
+                            },
+                        },
+                        {
+                            name: 'name',
+                            label: 'name',
+                        },
+                        {
+                            name: 'color',
+                            type: 'color',
+                            label: 'color',
+                        },
+                        {
+                            name: 'unit',
+                            label: 'unit',
+                        },
+                        {
+                            name: 'factor',
+                            label: 'factor',
+                            type: 'number',
+                            default: 1,
+                            tooltip: 'factor_tooltip',
+                        },
+                    ],
+                },
+            ],
             visDefaultStyle: {
                 width: 320,
                 height: 182,
@@ -195,17 +248,20 @@ class Consumption extends Generic<Record<string, any>, ConsumptionState> {
         };
     }
 
-    getTimeWidget(wid?: any): any {
+    getTimeWidget(wid?: string): HTMLDiv | null {
         const el = window.document.getElementById(wid || this.state.rxData.timeWidget);
-        const div: any = el && el.querySelector('.time-selector');
-        if (div && div._addEventHandler) {
+        const div: HTMLDiv | null | undefined = el?.querySelector('.time-selector');
+        if (div?._addEventHandler) {
             return div;
         }
 
         return null;
     }
 
-    getHistory(id: string, options: any) {
+    getHistory(
+        id: string,
+        options: ioBroker.GetHistoryOptions & { timeout?: number },
+    ): Promise<ioBroker.GetHistoryResult> {
         if (options.timeout) {
             return new Promise(resolve => {
                 let timeout: ReturnType<typeof setTimeout> | null = setTimeout(() => {
@@ -216,23 +272,22 @@ class Consumption extends Generic<Record<string, any>, ConsumptionState> {
                     }
                 }, options.timeout);
 
-                this.props.context.socket.getHistory(id, options)
-                    .then(result => {
-                        if (timeout) {
-                            clearTimeout(timeout);
-                            timeout = null;
-                            resolve(result);
-                        } else {
-                            console.warn(`Too late answer for ${id}`);
-                        }
-                    });
+                this.props.context.socket.getHistory(id, options).then(result => {
+                    if (timeout) {
+                        clearTimeout(timeout);
+                        timeout = null;
+                        resolve(result);
+                    } else {
+                        console.warn(`Too late answer for ${id}`);
+                    }
+                });
             });
         }
 
         return this.props.context.socket.getHistory(id, options);
     }
 
-    _readCharts() {
+    _readCharts(): void {
         const intervalType = this.getTimeInterval();
         const interval = getFromToTime(this.getTimeStart(), intervalType);
 
@@ -257,26 +312,42 @@ class Consumption extends Generic<Record<string, any>, ConsumptionState> {
         const intervalCount = types[intervalType].count;
         const times = new Array(intervalCount)
             .fill(0)
-            .map((_, i) => new Date(
-                interval.from.getTime() +
-                ((interval.to.getTime() - interval.from.getTime()) / intervalCount) * i
-                + 1,
-            ));
+            .map(
+                (_, i) =>
+                    new Date(
+                        interval.from.getTime() +
+                            ((interval.to.getTime() - interval.from.getTime()) / intervalCount) * i +
+                            1,
+                    ),
+            );
 
         if (this.state.rxData.difference) {
             // add one more step at the beginning
             if (intervalType === 'year') {
                 interval.from = new Date(interval.from.getFullYear(), interval.from.getMonth() - 1, 1);
             } else if (intervalType === 'month') {
-                interval.from = new Date(interval.from.getFullYear(), interval.from.getMonth(), interval.from.getDate() - 1);
+                interval.from = new Date(
+                    interval.from.getFullYear(),
+                    interval.from.getMonth(),
+                    interval.from.getDate() - 1,
+                );
             } else if (intervalType === 'week') {
-                interval.from = new Date(interval.from.getFullYear(), interval.from.getMonth(), interval.from.getDate() - 1);
+                interval.from = new Date(
+                    interval.from.getFullYear(),
+                    interval.from.getMonth(),
+                    interval.from.getDate() - 1,
+                );
             } else if (intervalType === 'day') {
-                interval.from = new Date(interval.from.getFullYear(), interval.from.getMonth(), interval.from.getDate(), interval.from.getHours() - 1);
+                interval.from = new Date(
+                    interval.from.getFullYear(),
+                    interval.from.getMonth(),
+                    interval.from.getDate(),
+                    interval.from.getHours() - 1,
+                );
             }
         }
 
-        const options = {
+        const options: ioBroker.GetHistoryOptions & { timeout?: number } = {
             instance: this.props.context.systemConfig?.common?.defaultHistory || 'history.0',
             start: interval.from.getTime(),
             end: interval.to.getTime(),
@@ -284,7 +355,6 @@ class Consumption extends Generic<Record<string, any>, ConsumptionState> {
             from: false,
             ack: false,
             q: false,
-            addID: false,
             aggregate: this.state.rxData.aggregate || 'total',
             percentile: this.state.rxData.percentile,
             quantile: this.state.rxData.quantile,
@@ -295,13 +365,13 @@ class Consumption extends Generic<Record<string, any>, ConsumptionState> {
 
         this.setState({ loading: true }, async () => {
             if (interval.from !== interval.to) {
-                const newState: Record<string, any> = { loading: false };
+                const newState: Partial<ConsumptionState> = { loading: false };
                 const format = types[this.getTimeInterval()].format;
 
                 for (let i = 1; i <= this.state.rxData.devicesCount; i++) {
                     if (this.state.rxData[`oid${i}`] && this.state.rxData[`oid${i}`] !== 'nothing_selected') {
                         const values = await this.getHistory(this.state.rxData[`oid${i}`], options);
-                        const history = (values as any[])
+                        const history = (values as Array<ioBroker.State & { id?: string; tsF: string; tsS: string }>)
                             .sort((a, b) => (a.ts > b.ts ? 1 : -1))
                             .filter(item => item && item.val !== undefined && item.val !== null);
 
@@ -312,7 +382,7 @@ class Consumption extends Generic<Record<string, any>, ConsumptionState> {
 
                         if (this.state.rxData.difference) {
                             let lastValue = history.findLast(item => item.ts < times[0].getTime()) || null;
-                            const data: any[] = [];
+                            const data: Array<{ ts: number; val: number }> = [];
                             newState[`history${i}`] = data;
                             for (let t = 0; t < times.length - 1; t++) {
                                 const actual = times[t].getTime();
@@ -320,7 +390,10 @@ class Consumption extends Generic<Record<string, any>, ConsumptionState> {
                                 const foundHistory = history.find(item => item.ts >= actual && item.ts < next);
                                 if (foundHistory) {
                                     if (lastValue !== null) {
-                                        data.push({ ts: times[t].getTime(), val: foundHistory.val - lastValue.val });
+                                        data.push({
+                                            ts: times[t].getTime(),
+                                            val: (foundHistory.val as number) - (lastValue.val as number),
+                                        });
                                     } else {
                                         data.push({ ts: times[t].getTime(), val: 0 });
                                     }
@@ -332,13 +405,17 @@ class Consumption extends Generic<Record<string, any>, ConsumptionState> {
                         } else {
                             newState[`history${i}`] = times.map(time => {
                                 const timeStr = moment(time).format(format);
-                                const foundHistory = history.findLast(item => item.tsF === timeStr);
+                                const foundHistory: { val: number; ts: number } | undefined = history.findLast(
+                                    item => item.tsF === timeStr,
+                                ) as { val: number; ts: number } | undefined;
                                 return foundHistory || { ts: time.getTime(), val: 0 };
                             });
                         }
                     }
                 }
-                this.setState(newState);
+                this.setState(
+                    newState as ConsumptionState & { rxData: ConsumptionRxData } & VisBaseWidgetState,
+                );
             }
         });
     }
@@ -352,19 +429,26 @@ class Consumption extends Generic<Record<string, any>, ConsumptionState> {
     }
 
     registerTimeSelector() {
-        if (!this.timeSelectorRegistered && this.state.rxData.timeWidget && this.props.context.views[this.props.view].widgets[this.state.rxData.timeWidget]) {
-            this.timeSelectorRegisterInterval = this.timeSelectorRegisterInterval || setInterval(() => {
+        if (
+            !this.timeSelectorRegistered &&
+            this.state.rxData.timeWidget &&
+            this.props.context.views[this.props.view].widgets[this.state.rxData.timeWidget]
+        ) {
+            this.timeSelectorRegisterInterval ||= setInterval(() => {
                 if (!this.timeSelectorRegistered && this.state.rxData.timeWidget) {
                     const el = this.getTimeWidget();
 
-                    if (el) {
+                    if (el?._addEventHandler) {
                         el._addEventHandler(this.onTimeFromWidgetChanged);
                         this.timeSelectorRegistered = this.state.rxData.timeWidget;
                     }
                 }
 
                 // stop interval
-                if ((!this.state.rxData.timeWidget || this.timeSelectorRegistered) && this.timeSelectorRegisterInterval) {
+                if (
+                    (!this.state.rxData.timeWidget || this.timeSelectorRegistered) &&
+                    this.timeSelectorRegisterInterval
+                ) {
                     clearInterval(this.timeSelectorRegisterInterval);
                     this.timeSelectorRegisterInterval = null;
                 }
@@ -372,15 +456,23 @@ class Consumption extends Generic<Record<string, any>, ConsumptionState> {
         }
     }
 
-    componentDidUpdate(prevProps: any, prevState: any): void {
+    componentDidUpdate(
+        prevProps: VisRxWidgetProps,
+        prevState: Readonly<ConsumptionState & { rxData: ConsumptionRxData } & VisBaseWidgetState>,
+    ): void {
         super.componentDidUpdate(prevProps, prevState);
 
-        if (this.state.rxData.timeWidget && this.props.context.views[this.props.view].widgets[this.state.rxData.timeWidget]) {
+        if (
+            this.state.rxData.timeWidget &&
+            this.props.context.views[this.props.view].widgets[this.state.rxData.timeWidget]
+        ) {
             if (this.timeSelectorRegistered && this.state.rxData.timeWidget !== this.timeSelectorRegistered) {
-                this.getTimeWidget(this.timeSelectorRegistered)?._removeEventHandler(this.onTimeFromWidgetChanged);
+                this.getTimeWidget(this.timeSelectorRegistered)?._removeEventHandler?.(this.onTimeFromWidgetChanged);
                 this.timeSelectorRegistered = null;
-                this.timeSelectorRegisterInterval && clearInterval(this.timeSelectorRegisterInterval);
-                this.timeSelectorRegisterInterval = null;
+                if (this.timeSelectorRegisterInterval) {
+                    clearInterval(this.timeSelectorRegisterInterval);
+                    this.timeSelectorRegisterInterval = null;
+                }
             }
             this.registerTimeSelector();
         }
@@ -411,28 +503,28 @@ class Consumption extends Generic<Record<string, any>, ConsumptionState> {
 
         // unregister from time selector
         if (this.timeSelectorRegistered) {
-            this.getTimeWidget(this.timeSelectorRegistered)?._removeEventHandler(this.onTimeFromWidgetChanged);
+            this.getTimeWidget(this.timeSelectorRegistered)?._removeEventHandler?.(this.onTimeFromWidgetChanged);
             this.timeSelectorRegistered = false;
         }
 
         super.componentWillUnmount();
     }
 
-    onTimeFromWidgetChanged = (event: any, value: any) => {
+    onTimeFromWidgetChanged = (event: 'unmount' | 'update', value?: { start: number; interval: number }): void => {
         if (event === 'unmount') {
             if (this.timeSelectorRegistered) {
                 const el = window.document.getElementById(this.state.rxData.timeWidget);
 
                 if (el) {
-                    const div: any = el.querySelector('.time-selector');
+                    const div: HTMLDiv | null | undefined = el.querySelector('.time-selector');
                     if (div) {
-                        div._removeEventHandler((this as any).onTimeChange);
+                        div._removeEventHandler?.(this.onTimeFromWidgetChanged);
                         this.timeSelectorRegistered = false;
                     }
                 }
             }
             this.registerTimeSelector();
-        } else if (event === 'update') {
+        } else if (event === 'update' && value) {
             if (this.timeStart !== value.start || this.timeInterval !== value.interval) {
                 this.timeStart = value.start;
                 this.timeInterval = value.interval;
@@ -468,14 +560,14 @@ class Consumption extends Generic<Record<string, any>, ConsumptionState> {
         let axisUnit = '';
         for (let i = 1; i <= this.state.rxData.devicesCount; i++) {
             if (!axisUnit && this.state.rxData[`unit${i}`]) {
-                axisUnit = this.state.rxData[`unit${i}`];
+                axisUnit = this.state.rxData[`unit${i}`] as string;
             }
             data.push({
                 name: this.state.rxData[`name${i}`] || '',
                 value: this.state.values[`${this.state.rxData[`oid${i}`]}.val`] || '',
                 values: this.state[`history${i}`] || [],
                 color: this.state.rxData[`color${i}`] || '',
-                factor: parseFloat(this.state.rxData[`factor${i}`]) || 1,
+                factor: parseFloat(this.state.rxData[`factor${i}`] as string) || 1,
             });
         }
 
@@ -519,21 +611,19 @@ class Consumption extends Generic<Record<string, any>, ConsumptionState> {
             yAxis: { name: axisUnit },
             xAxis: {
                 type: 'category',
-                data: data?.[0]?.values?.map((dateValue: any) => moment(dateValue.ts).format(
-                    timeTypes[this.getTimeInterval()],
-                )),
+                data: data?.[0]?.values?.map(dateValue =>
+                    moment(dateValue.ts).format(timeTypes[this.getTimeInterval()]),
+                ),
             },
-            series: data.map(item => (
-                {
-                    type: 'bar',
-                    name: item.name,
-                    itemStyle: {
-                        color: item.color,
-                    },
-                    data: item.values?.map((dateValue: any) => dateValue.val * item.factor),
-                    stack: this.state.rxData.stacked === false ? undefined : 'one',
-                }
-            )),
+            series: data.map(item => ({
+                type: 'bar',
+                name: item.name,
+                itemStyle: {
+                    color: item.color,
+                },
+                data: item.values?.map(dateValue => dateValue.val * item.factor),
+                stack: this.state.rxData.stacked === false ? undefined : 'one',
+            })),
         };
     }
 
@@ -547,7 +637,7 @@ class Consumption extends Generic<Record<string, any>, ConsumptionState> {
             result = this.props.context.timeStart;
         }
 
-        result = result || 0;
+        result ||= 0;
 
         return result;
     }
@@ -561,7 +651,7 @@ class Consumption extends Generic<Record<string, any>, ConsumptionState> {
         } else {
             result = this.props.context.timeInterval;
         }
-        result = result || 'day';
+        result ||= 'day';
 
         return result;
     }
@@ -576,17 +666,21 @@ class Consumption extends Generic<Record<string, any>, ConsumptionState> {
             size = this.refCardContent.current.offsetHeight;
         }
 
-        const content = <div
-            ref={this.refCardContent}
-            style={styles.cardContent}
-        >
-            {size && <ReactEchartsCore
-                option={this.getOption()}
-                theme={(this.props as any).themeType === 'dark' ? 'dark' : ''}
-                style={{ height: `${size}px`, width: '100%' }}
-                opts={{ renderer: 'svg' }}
-            /> }
-        </div>;
+        const content = (
+            <div
+                ref={this.refCardContent}
+                style={styles.cardContent}
+            >
+                {size && (
+                    <ReactEchartsCore
+                        option={this.getOption()}
+                        theme={(this.props.context.themeType === 'dark' ? 'dark' : '')}
+                        style={{ height: `${size}px`, width: '100%' }}
+                        opts={{ renderer: 'svg' }}
+                    />
+                )}
+            </div>
+        );
 
         if (this.state.rxData.noCard || props.widget.usedInWidget) {
             return content;

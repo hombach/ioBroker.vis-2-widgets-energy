@@ -12,7 +12,7 @@ export function getFromToTime(timeStart: number | Date | null | undefined, timeI
     } else if (timeInterval === 'week') {
         // getDay() returns 0 for Sunday; treat it as 7 so the week always starts on
         // Monday and the current Sunday stays inside its own week (#270, #290).
-        // Otherwise on Sundays the whole week window was shifted forward by 7 days.
+        // Otherwise, on Sundays the whole week window was shifted forward by 7 days.
         const dayOfWeek = from.getDay() || 7;
         from.setDate(from.getDate() - dayOfWeek + 1);
         from.setHours(0, 0, 0, 0);
@@ -35,5 +35,3 @@ export function getFromToTime(timeStart: number | Date | null | undefined, timeI
 
     return { from, to };
 }
-
-export default getFromToTime;
