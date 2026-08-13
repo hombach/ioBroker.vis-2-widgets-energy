@@ -27,6 +27,7 @@ jobs:
       - uses: ioBroker/testing-action-check@v2.0.0
         with:
           node-version: '24.x'
+          install-command: 'npm run npm'
           lint: true
           test-command: 'false'
 
