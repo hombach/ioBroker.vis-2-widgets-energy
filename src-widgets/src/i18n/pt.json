@@ -110,5 +110,11 @@
   "difference": "Calcular diferença",
   "difference_tooltip": "A diferença entre dois valores será usada. Útil para contadores.",
   "Value": "Valor",
-  "text_color": "Cor do texto"
+  "text_color": "Cor do texto",
+  "stacked": "Barras empilhadas",
+  "value2": "OID 2",
+  "value2_tooltip": "Um segundo valor no círculo, p. ex. o estado de carga da bateria (SoC em %)",
+  "value2_unit": "OID 2 unidade",
+  "no_animation": "Sem animação",
+  "animation_duration": "Duração da animação (ms)"
 }

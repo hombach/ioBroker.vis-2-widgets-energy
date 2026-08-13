@@ -1,7 +1,7 @@
 {
   "common": {
     "name": "vis-2-widgets-energy",
-    "version": "1.0.2",
+    "version": "2.0.0",
     "news": {
       "1.0.2": {
         "en": "updated packages",
@@ -28,19 +28,6 @@
         "pl": "Usunięty z pakietem Styles",
         "uk": "Видаліть пакет \"Стиль\"",
         "zh-cn": "用 Styles 软件包删除"
-      },
-      "0.3.12": {
-        "en": "Allowed setting the title color",
-        "de": "Erlaubte Einstellung der Titelfarbe",
-        "ru": "Позволяет установить цвет заголовка",
-        "pt": "Permite definir a cor do título",
-        "nl": "De titelkleur instellen is toegestaan",
-        "fr": "Réglage autorisé de la couleur du titre",
-        "it": "Impostare il colore del titolo",
-        "es": "Permitido fijar el color del título",
-        "pl": "Dozwolone ustawienie koloru tytułu",
-        "uk": "Дозволено налаштування кольору назв",
-        "zh-cn": "允许设置标题颜色"
       },
       "0.3.11": {
         "en": "show value with green color if we feed back into power line",
@@ -97,8 +84,7 @@
     },
     "licenseInformation": {
       "license": "MIT",
-      "type": "free",
-      "link": "https://github.com/ioBroker/ioBroker.vis-2-widgets-energy/blob/master/LICENSE"
+      "type": "free"
     },
     "titleLang": {
       "en": "Vis 2 Widgets Energy",
@@ -139,7 +125,6 @@
     "readme": "https://github.com/ioBroker/ioBroker.vis-2-widgets-energy/blob/master/README.md",
     "loglevel": "info",
     "mode": "none",
-    "noConfig": true,
     "adminUI": {
       "config": "none"
     },
@@ -154,6 +139,7 @@
         "i18n": "component",
         "name": "vis2energyWidgets",
         "url": "vis-2-widgets-energy/customWidgets.js",
+        "bundlerType": "module",
         "components": [
           "ConsumptionComparison",
           "Consumption",
@@ -162,6 +148,11 @@
         ]
       }
     },
+    "dependencies": [
+      {
+        "vis-2": ">=2.12.8"
+      }
+    ],
     "restartAdapters": [
       "vis-2"
     ],
