@@ -116,5 +116,7 @@
   "value2_tooltip": "Een tweede waarde in de cirkel, bijv. de laadtoestand van een accu (SoC in %)",
   "value2_unit": "OID 2 eenheid",
   "no_animation": "Geen animatie",
-  "animation_duration": "Animatieduur (ms)"
+  "animation_duration": "Animatieduur (ms)",
+  "default_radius_size": "Standaard straalgrootte",
+  "default_radius_size_tooltip": "In procent van de widgetbreedte"
 }

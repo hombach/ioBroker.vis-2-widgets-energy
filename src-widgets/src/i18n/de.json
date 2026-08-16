@@ -116,5 +116,7 @@
   "value2_tooltip": "Ein zweiter Wert im Kreis, z. B. der Batterie-Ladezustand (SoC in %)",
   "value2_unit": "OID 2 Einheit",
   "no_animation": "Keine Animation",
-  "animation_duration": "Animationsdauer (ms)"
+  "animation_duration": "Animationsdauer (ms)",
+  "default_radius_size": "Standardradiusgröße",
+  "default_radius_size_tooltip": "In Prozent der Widget-Breite"
 }

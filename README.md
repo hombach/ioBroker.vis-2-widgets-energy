@@ -24,7 +24,12 @@ This widget set consists of the following widgets:
 <!--
     ### **WORK IN PROGRESS**
 -->
+
 ## Changelog
+
+### **WORK IN PROGRESS**
+* (hombach) Fixed missing translation for the "default radius size" field in the distribution widget config (#527)
+
 ### 2.0.1 (2026-08-13)
 * (hombach) **BREAKING:** the comparison widget no longer auto-converts W→Wh / kW→kWh nor divides Wh values by 1000. It now shows the real datapoint unit and raw value; use the "factor" field for scaling (#243)
 * (hombach) Comparison widget: option to disable chart animations or set their duration (#416)

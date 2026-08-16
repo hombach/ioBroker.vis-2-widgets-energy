@@ -116,5 +116,7 @@
   "value2_tooltip": "Второе значение в круге, напр. уровень заряда батареи (SoC в %)",
   "value2_unit": "OID 2 единица",
   "no_animation": "Без анимации",
-  "animation_duration": "Длительность анимации (мс)"
+  "animation_duration": "Длительность анимации (мс)",
+  "default_radius_size": "Размер радиуса по умолчанию",
+  "default_radius_size_tooltip": "В процентах от ширины виджета"
 }

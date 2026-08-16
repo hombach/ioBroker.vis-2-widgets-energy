@@ -116,5 +116,7 @@
   "value2_tooltip": "Um segundo valor no círculo, p. ex. o estado de carga da bateria (SoC em %)",
   "value2_unit": "OID 2 unidade",
   "no_animation": "Sem animação",
-  "animation_duration": "Duração da animação (ms)"
+  "animation_duration": "Duração da animação (ms)",
+  "default_radius_size": "Tamanho padrão do raio",
+  "default_radius_size_tooltip": "Em porcentagem da largura do widget"
 }
