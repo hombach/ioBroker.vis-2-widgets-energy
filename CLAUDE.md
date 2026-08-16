@@ -97,6 +97,6 @@ Use `npm run release-patch|release-minor|release-major` (`@alcalzone/release-scr
 
 Do not hand-edit version numbers or add changelog/news entries manually — note that `src-widgets/package.json` carries its own version field that mirrors the root one.
 
-**The pending release is a breaking one** and needs `release-major`: the comparison widget no longer auto-converts W→Wh / kW→kWh nor divides Wh by 1000, so existing dashboards using Wh datapoints show values 1000× larger until the per-device `factor` is set.
+The `2.0.0` release (shipped 2026-08) was a breaking one: the comparison widget no longer auto-converts W→Wh / kW→kWh nor divides Wh by 1000, so dashboards using Wh datapoints show values 1000× larger until the per-device `factor` is set. That is why the whole Vite/TypeScript modernization landed as a major. Current published version is `2.0.1`.
 
 Dependency bumps arrive as Dependabot PRs against both `package.json` and `src-widgets/package.json` and are auto-merged; `npm run update-packages` does the same locally for both trees.
