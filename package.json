@@ -27,7 +27,7 @@
     "@iobroker/vis-2-widgets-react-dev": "^4.0.4",
     "@iobroker/vis-2-widgets-testing": "^1.0.6",
     "@types/node": "^22.20.1",
-    "typescript": "~6.0.3"
+    "typescript": "~7.0.2"
   },
   "files": [
     "admin/",
