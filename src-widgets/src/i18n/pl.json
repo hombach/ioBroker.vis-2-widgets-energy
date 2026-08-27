@@ -116,5 +116,7 @@
   "value2_tooltip": "Druga wartość w kółku, np. stan naładowania baterii (SoC w %)",
   "value2_unit": "OID 2 jednostka",
   "no_animation": "Bez animacji",
-  "animation_duration": "Czas animacji (ms)"
+  "animation_duration": "Czas animacji (ms)",
+  "default_radius_size": "Domyślny rozmiar promienia",
+  "default_radius_size_tooltip": "W procentach szerokości widżetu"
 }

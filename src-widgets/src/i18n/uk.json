@@ -116,5 +116,7 @@
   "value2_tooltip": "Друге значення у колі, напр. рівень заряду батареї (SoC у %)",
   "value2_unit": "OID 2 одиниця",
   "no_animation": "Без анімації",
-  "animation_duration": "Тривалість анімації (мс)"
+  "animation_duration": "Тривалість анімації (мс)",
+  "default_radius_size": "Розмір радіуса за замовчуванням",
+  "default_radius_size_tooltip": "У відсотках від ширини віджета"
 }
