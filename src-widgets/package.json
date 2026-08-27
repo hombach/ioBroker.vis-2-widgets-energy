@@ -7,8 +7,8 @@
         "@emotion/styled": "^11.14.1",
         "@iobroker/adapter-react-v5": "^8.3.1",
         "@iobroker/vis-2-widgets-react-dev": "^4.0.4",
-        "@mui/icons-material": "^9.2.0",
-        "@mui/material": "^9.2.0",
+        "@mui/icons-material": "^6.5.0",
+        "@mui/material": "^6.5.0",
         "date-fns": "^4.4.0",
         "echarts": "^6.1.0",
         "echarts-for-react": "^3.0.6",
@@ -18,7 +18,7 @@
         "react-dom": "^18.3.1"
     },
     "devDependencies": {
-        "@iobroker/types-vis-2": "^2.14.4",
+        "@iobroker/types-vis-2": "^2.15.4",
         "@module-federation/vite": "^1.7.2",
         "@types/react": "^18.3.24",
         "@types/react-dom": "^18.3.7",
